@@ -10,6 +10,8 @@ env:
   - CCACHE_SIZE=100M
   - CCACHE_TEMPDIR=/tmp/.ccache-temp
   - CCACHE_COMPRESS=1
+  - AGAMA_VERSION=0.3.1
+  - PKG_VERSION=0.3.1
 cache:
   apt: true
   directories:
@@ -18,23 +20,30 @@ cache:
 matrix:
   fast_finish: true
   include:
-  - env: BUILD_ICONS=assets/icons/agama_icons/128x128.png IGNORE_OS_ASSETS_1=assets/bin/osx
-      IGNORE_OS_ASSETS_2=assets/bin/win64 TARGET_PLATFORM=linux BUILD_DIR=Agama-linux-x64
-      ASSETS_DIR=linux64 BUILD_VARIANT=Linux64
-  - env: BUILD_ICONS=assets/icons/agama_icons/agama_app_icon.ico IGNORE_OS_ASSETS_1=assets/bin/osx
-      IGNORE_OS_ASSETS_2=assets/bin/linux64 TARGET_PLATFORM=win32 BUILD_DIR=Agama-win32-x64
-      PACKAGES=winehq-devel ASSETS_DIR=win64 BUILD_VARIANT=Win64
+  - env: TARGET_PLATFORM=linux BUILD_DIR=Agama-linux-x64
+      ARTIFACT_SET=Linux64 BUILD_VARIANT=linux64 BUILD_SCRIPT=electron-build-linux.sh
+  - env: TARGET_PLATFORM=win32 BUILD_DIR=Agama-win32-x64
+      PACKAGES=winehq-devel ARTIFACT_SET=Win64 BUILD_VARIANT=win64 BUILD_SCRIPT=electron-build-windows.sh
+  - env: TARGET_PLATFORM=osx BUILD_DIR=Agama-darwin-x64
+      ARTIFACT_SET=Mac64 BUILD_VARIANT=osx BUILD_SCRIPT=electron-build-osx.sh
 before_install:
 - openssl aes-256-cbc -K $encrypted_a41fbd06a4b9_key -iv $encrypted_a41fbd06a4b9_iv
   -in AUTH_KEY.json.enc -out AUTH_KEY.json -d
-- npm install electron-packager -g && npm install electron -g --unsafe-perm=true && npm install
+- npm install electron-packager -g && npm install electron -g --unsafe-perm=true &&
+  npm install
 - gcloud auth activate-service-account --key-file AUTH_KEY.json
 - rm AUTH_KEY.json && rm AUTH_KEY.json.enc
-- mkdir -p assets/bin/$ASSETS_DIR
-- gsutil cp gs://$BUCKET/$ARTIFACTS/$TRAVIS_BRANCH/$BUILD_VARIANT.tar.gz .
+- mkdir -p assets/bin/$BUILD_VARIANT
+- gsutil cp gs://$BUCKET/$EXECUTABLES/$TRAVIS_BRANCH/$BUILD_VARIANT.tar.gz . || gsutil
+  cp gs://$BUCKET/$EXECUTABLES/master/$BUILD_VARIANT.tar.gz .
 - tar -xzvf $BUILD_VARIANT.tar.gz && rm $BUILD_VARIANT.tar.gz
-- cp -rvf $BUILD_VARIANT/* assets/bin/$ASSETS_DIR
-- cd gui/EasyDEX-GUI/react && gsutil cp gs://$BUCKET/EasyDEX-GUI/$TRAVIS_BRANCH/build.tar.gz .
+- if [ "$BUILD_VARIANT" != "linux64" ]; then gsutil cp gs://$BUCKET/$ARTIFACTS/$ARTIFACT_SET.tar.gz .
+  && tar -xzvf $ARTIFACT_SET.tar.gz && rm $ARTIFACT_SET.tar.gz && cp -r $ARTIFACT_SET
+  $BUILD_VARIANT && rm -rf $ARTIFACT_SET; fi
+- if [ "$BUILD_VARIANT" = "osx" ]; then chmod -R +x $BUILD_VARIANT; fi
+- cp -rvf $BUILD_VARIANT/* assets/bin/$BUILD_VARIANT && rm -rf $BUILD_VARIANT
+- cd gui/EasyDEX-GUI/react && gsutil cp gs://$BUCKET/EasyDEX-GUI/$TRAVIS_BRANCH/build.tar.gz
+  .
 - tar -xzvf build.tar.gz && rm build.tar.gz
 - cd ../../..
 install:
@@ -49,12 +58,11 @@ install:
   install --install-recommends -qq $PACKAGES; fi
 - npm install
 script:
-- electron-packager . --platform=$TARGET_PLATFORM --arch=x64 --icon=$BUILD_ICONS --out=build/
-  --buildVersion=$BUILD_VERSION --ignore=$IGNORE_OS_ASSETS_1 --ignore=$IGNORE_OS_ASSETS_2
-  --overwrite
+ - ./buildscripts/$BUILD_SCRIPT
 after_script:
-- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd build && tar -czf $BUILD_DIR.tar.gz $BUILD_DIR && gsutil cp $BUILD_DIR.tar.gz gs://$BUCKET/$PROJECT/$TRAVIS_BRANCH/;
+- if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd build && tar -czf $BUILD_DIR.tar.gz
+  $BUILD_DIR && gsutil cp $BUILD_DIR.tar.gz gs://$BUCKET/$PROJECT/$TRAVIS_BRANCH/;
   fi
 notifications:
   slack:
-    secure: EtJmqOQWaSaZaKL8JthAD9xD2ztooM9l5bbtFFYo4DaDI17LcNrsAi6DHJP9qo3VcbKYUgTpQ1X8bIOmV8V3JXPXvKZB8PVRcziDdCYVTlXdaILleQMfLeOEujI5MzwqmOt9RgRLLn436w4UgeXoSdox4lszceCXbZHLNPxspFYpW8BPi/ZQIppyQ3Nk/2B8KXqjzeSzrKs3Ydj24uwoPRlOcdCv77dXAzFU00tX2/vy/23qV0+Ak9b3d7+UbOq8Y7rsrYkQDeyYthV1Kka+IsKW+ed9+bZW/grgvKGf3+eHK5dmIgI3SCVioVcC1EMVLi/84x/my7lTSzcqQOotPNeMLVcuRO0pR6cQq6wQpnHtuoAZ//zG/tQSvdz1XU4HYxU5ahHyK0idHbN23MZaQsT/6TzQ+4oVaoWwDgU52b2KHCJkxMl/6yNU+YUuMf9ypKZTy5YiQfhtYK5Lus0pLyXAVrwkmP/9itgv6ubeM8XwVJ/RvsZt/zxCyQ7J0yO8E3lV/KCbAGdNipek3m+0HRQOFk7Gl3V1DNDUqfVXz151O1Suf4m6aqBX6hFTJ80SRgc7Cc3+JdfueDuhxLBu6c2GBipYWqlaxPml/pvhMMbH0TxtfBY6CtGk+61GfInFAPz2TyCBkgos2uAnUKo5tB2kqgwf2WWC546q3BkqZ5Q=
+    secure: tHddHa3l8QixuywIMOrSmsFfk3vGTcLXu/49IpDgYoO8IhZ91Ux6jBX1y9bK8mFwmjNzMUZBB4bH23JzQyv1JekQaihzCL4m5Ut8gcDRStUplO4Aye16DPTWzhy+UQYzkYwP/lEeTU/lNE/QEq7tC7nMbHn2kY9sC9dr5wHmBsGCeIB49ikaL2MdJThP0/9NFaBK/Z7eOmnd/l/76x2Vji2OvBYjjkCPPRE5bZ8Vvw6S/fA2abNirD3ymB9w7ooL4HzbZZw6gxKDSU0RcK8YCvYuDoEMDgcq//VEpZE852hmo9Pxs/LArcunztFmaoXxngwMejDM2VuDSELq/ytP/XpyTWC/bmOz+07BbPpUjZiu8psnxVerBt8l6oO34xU6R4U9JaqNdALJyMTO7gs9j53hZfi2Onr+/nxyJ9ec1gkJBzdIOnOxlZYXJOmuAtWBnoa5DvJvED9DBICIpkeTPzSJXMggAGDNHWmm4CoB1oHUbKUg3C5G7AGB63oHX9tDZ0A21ZOhMGx4DItQ6C7bH9FSp1FfA5CsnCO56JRaon+QF/vIO4y0OV+3QAL59kBDmy6P7VSzsGB07JApYJ/e9iLS2vXisSr6hM03rynSvVcfJHcDfP/b/fzLcleIWwnel0F1Dz0A5VF39g9S/NYo1Ttt+MphnWfKl+Za6Rp8z/M=

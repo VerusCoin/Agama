@@ -1,7 +1,7 @@
 {
   "name": "agama-app",
   "productName": "Agama",
-  "version": "0.2.30",
+  "version": "0.3.1",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -10,8 +10,8 @@
     "make-rpm": "node make-rpm.js",
     "make-deb": "node make-deb.js"
   },
-  "repository": "https://github.com/KomodoPlatform/Agama/",
-  "homepage": "http://komodoplatform.com",
+  "repository": "https://github.com/VerusCoin/Agama/",
+  "homepage": "https://veruscoin.io/",
   "keywords": [
     "agama",
     "SuperNET",
@@ -19,9 +19,10 @@
     "multicoin",
     "wallet",
     "spv",
-    "jumblr"
+    "jumblr",
+    "VRSC"
   ],
-  "author": "SuperNET Team",
+  "author": "VerusCoin",
   "license": "MIT",
   "devDependencies": {
     "electron": "2.0.2"
