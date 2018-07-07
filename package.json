@@ -9,9 +9,7 @@
     "make-patch": "./make-patch.sh",
     "make-rpm": "node make-rpm.js",
     "make-deb": "node make-deb.js",
-    "package-linux": "electron-packager . --platform=linux --arch=x64 --icon=assets/icons/agama_icons/128x128.png --prune=true --out=build/ --overwrite",
-    "package-macos": "electron-packager . --platform=darwin --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.icns --prune=true --out=build/ --overwrite",
-    "package-windows": "electron-packager . --platform=win32 --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.ico --prune=true --out=build/ --overwrite"
+    "test": "mocha"
   },
   "repository": "https://github.com/VerusCoin/Agama/",
   "homepage": "https://veruscoin.io/",
@@ -29,7 +27,12 @@
   "author": "VerusCoin",
   "license": "MIT",
   "devDependencies": {
-    "electron": "2.0.2"
+    "electron": "2.0.2",
+    "mocha": "^5.2.0",
+    "spectron": "^3.8.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "jquery": "^3.3.1"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
@@ -46,7 +49,6 @@
     "body-parser": "^1.15.2",
     "buffer-reverse": "^1.0.1",
     "coinselect": "github:bitcoinjs/coinselect",
-    "electron": "^2.0.2",
     "electron-installer-debian": "^0.8.1",
     "electron-packager": "^12.1.0",
     "express": "^4.14.0",
