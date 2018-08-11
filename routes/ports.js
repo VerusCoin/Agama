@@ -37,7 +37,6 @@ const assetChainPorts = {
   'PRLPAY': '9679',
   'ZILLA': '10041',
   'VRSC': '27486',
-  'VERUSTEST': '27486',
 };
 
 module.exports = assetChainPorts;

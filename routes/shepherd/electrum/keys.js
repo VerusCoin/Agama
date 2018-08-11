@@ -148,7 +148,7 @@ module.exports = (shepherd) => {
 
   shepherd.addressVersionCheck = (network, address) => {
     const _network = shepherd.getNetworkData(network.toLowerCase());
-    if (network === 'VERUSTEST' || network === 'VRSC'){
+    if (network === 'VRSC'){
       return true;
     }
     else {
