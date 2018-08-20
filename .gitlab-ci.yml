@@ -1,117 +1,94 @@
 stages:
-  - build
-  - test
-  - deploy
+- build
+- deploy
 variables:
   DOCKER_DRIVER: overlay2
   AGAMA_VERSION: 0.3.12a
-  EASYDEX_GUI_ARTIFACT: build.tar.gz
+  EASYDEX_GUI_BUILD: build.tar.gz
   AGAMA_ARTIFACTS_LINUX: linux64.tar.gz
   AGAMA_ARTIFACTS_MACOS: osx.tar.gz
   AGAMA_ARTIFACTS_WINDOWS: win64.zip
   ELECTRON_BUILD_LINUX: Agama-linux-x64
   ELECTRON_BUILD_WINDOWS: Agama-win32-x64
   ELECTRON_BUILD_OSX: Agama-darwin-x64
-  AGAMA_LINUX_PORTABLE: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}-beta.tar.gz
-  AGAMA_WINDOWS_PORTABLE: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
-  AGAMA_OSX_PORTABLE: ${ELECTRON_BUILD_OSX}-v${AGAMA_VERSION}-beta.tar.gz
+  AGAMA_LINUX: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}-beta.tar.gz
+  AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
+  AGAMA_OSX: ${ELECTRON_BUILD_OSX}-v${AGAMA_VERSION}-beta.tar.gz
   GIT_SUBMODULE_STRATEGY: recursive
 
 build:linux:
   image: asherd/agama-builder
   stage: build
   before_script:
-    - echo "$AUTH_KEY" > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/Linux/$AGAMA_ARTIFACTS_LINUX . || gsutil cp $STAGING/VerusCoin/master/Linux/$AGAMA_ARTIFACTS_LINUX .
-    - mkdir -p assets/bin/
-    - tar -xzf $AGAMA_ARTIFACTS_LINUX --directory  assets/bin/ && ls assets/bin
-    - rm $AGAMA_ARTIFACTS_LINUX
-
-
+  - echo "$AUTH_KEY" > AUTH_KEY.json
+  - gcloud auth activate-service-account --key-file AUTH_KEY.json
+  - rm AUTH_KEY.json
+  - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react
+  - rm $EASYDEX_GUI_BUILD
+  - mkdir -p assets/bin/
   script:
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-linux.sh
-    - cd build
-    - tar -czf $AGAMA_LINUX_PORTABLE $ELECTRON_BUILD_LINUX
-    - mv $AGAMA_LINUX_PORTABLE ..
+  - npm install electron-packager -g
+  - npm install electron -g --unsafe-perm=true
+  - npm install
+  - ./buildscripts/electron-build-linux.sh
+  - cd build
+  - tar -czf $AGAMA_LINUX $ELECTRON_BUILD_LINUX
+  - mv $AGAMA_LINUX ..
   artifacts:
     paths:
-    - $AGAMA_LINUX_PORTABLE
+    - $AGAMA_LINUX
     expire_in: 1 week
+
 
 build:windows:
   stage: build
-  image: asherd/agama-builder
+  image: asherd/agama-builder:windows
   before_script:
-    - echo $AUTH_KEY > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/Windows/$AGAMA_ARTIFACTS_WINDOWS . || gsutil cp $STAGING/VerusCoin/master/Windows/$AGAMA_ARTIFACTS_WINDOWS .
-    - mkdir -p assets/bin/
-    - unzip $AGAMA_ARTIFACTS_WINDOWS -d assets/bin/ && ls assets/bin
-    - rm $AGAMA_ARTIFACTS_WINDOWS
-    - ./binary_artifacts_win.sh
-
+  - echo $AUTH_KEY > AUTH_KEY.json
+  - gcloud auth activate-service-account --key-file AUTH_KEY.json
+  - rm AUTH_KEY.json
+  - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react
+  - rm $EASYDEX_GUI_BUILD
+  - mkdir -p assets/bin/
   script:
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-windows.sh
-    - cd build
-    - zip -r $AGAMA_WINDOWS_PORTABLE $ELECTRON_BUILD_WINDOWS
-    - mv $AGAMA_WINDOWS_PORTABLE ..
+  - npm install electron-packager -g
+  - npm install electron -g --unsafe-perm=true
+  - npm install
+  - ./buildscripts/electron-build-windows.sh
+  - cd build
+  - zip -r $AGAMA_WINDOWS $ELECTRON_BUILD_WINDOWS
+  - mv $AGAMA_WINDOWS ..
   artifacts:
     paths:
-    - $AGAMA_WINDOWS_PORTABLE
+    - $AGAMA_WINDOWS
     expire_in: 1 week
+
 
 build:mac:
   stage: build
   image: asherd/agama-builder
   before_script:
-    - echo "$AUTH_KEY" > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/MacOS/$AGAMA_ARTIFACTS_MACOS . || gsutil cp $STAGING/VerusCoin/master/MacOS/$AGAMA_ARTIFACTS_MACOS .
-    - mkdir -p assets/bin/
-    - tar -xzf $AGAMA_ARTIFACTS_MACOS --directory  assets/bin/
-    - rm $AGAMA_ARTIFACTS_MACOS
-    
-  script: 
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-osx.sh
-    - cd build
-    - tar -czf $AGAMA_OSX_PORTABLE $ELECTRON_BUILD_OSX
-    - mv $AGAMA_OSX_PORTABLE ..
+  - echo "$AUTH_KEY" > AUTH_KEY.json
+  - gcloud auth activate-service-account --key-file AUTH_KEY.json
+  - rm AUTH_KEY.json
+  - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react
+  - rm $EASYDEX_GUI_BUILD
+  - mkdir -p assets/bin/
+  script:
+  - npm install electron-packager -g
+  - npm install electron -g --unsafe-perm=true
+  - npm install
+  - ./buildscripts/electron-build-osx.sh
+  - cd build
+  - tar -czf $AGAMA_OSX $ELECTRON_BUILD_OSX
+  - mv $AGAMA_OSX ..
   artifacts:
     paths:
-    - $AGAMA_OSX_PORTABLE
+    - $AGAMA_OSX
     expire_in: 1 week
-    
-
-
-.test:
-  stage: test
-  image: node:8.11.3
-  script:
-    - npm install
-    - npm test
-
 
 deploy:
   stage: deploy
@@ -124,9 +101,10 @@ deploy:
   - mkdir -p $CI_COMMIT_REF_NAME/Windows
   - mkdir -p $CI_COMMIT_REF_NAME/Linux
   - mkdir -p $CI_COMMIT_REF_NAME/MacOS
-  - mv $AGAMA_LINUX_PORTABLE $CI_COMMIT_REF_NAME/Linux
-  - mv $AGAMA_WINDOWS_PORTABLE $CI_COMMIT_REF_NAME/Windows
-  - mv $AGAMA_OSX_PORTABLE $CI_COMMIT_REF_NAME/MacOS
+  - mv $AGAMA_LINUX $CI_COMMIT_REF_NAME/Linux
+  - mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows
+  - mv $AGAMA_OSX $CI_COMMIT_REF_NAME/MacOS
   - echo $AUTH_KEY > AUTH_KEY.json
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
+  - curl -X POST -F token=$CI_JOB_TOKEN --form ref=$CI_COMMIT_REF_NAME https://gitlab.com/api/v4/projects/8018638/trigger/pipeline
