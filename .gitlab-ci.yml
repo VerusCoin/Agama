@@ -1,6 +1,7 @@
 stages:
-- build
-- deploy
+  - build
+  - test
+  - deploy
 variables:
   DOCKER_DRIVER: overlay2
   AGAMA_VERSION: 0.3.13
