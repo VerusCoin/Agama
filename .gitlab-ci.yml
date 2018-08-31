@@ -108,4 +108,5 @@ deploy:
       -F ref=master
       -F variables\[CLI_VERSION\]="$AGAMA_VERSION"
       -F variables\[AGAMA_VERSION\]="$AGAMA_VERSION"
+      -F variables\[CLI_BRANCH\]="$CI_COMMIT_REF_NAME"
       "https://gitlab.com/api/v4/projects/8018638/trigger/pipeline"
