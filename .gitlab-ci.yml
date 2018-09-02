@@ -4,7 +4,7 @@ stages:
   - deploy
 variables:
   DOCKER_DRIVER: overlay2
-  AGAMA_VERSION: 0.3.12a
+  AGAMA_VERSION: 0.3.13
   EASYDEX_GUI_ARTIFACT: build.tar.gz
   AGAMA_ARTIFACTS_LINUX: linux64.tar.gz
   AGAMA_ARTIFACTS_MACOS: osx.tar.gz
