@@ -111,6 +111,7 @@ build:mac:
       rm $VERUS_CLI_MACOS &&
       mv $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/verus-cli $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/osx
   script:
+  - npm install electron -g --unsafe-perm=true
   - npm install electron-packager -g
   - npm run package-mac
   - npm run create-installer-mac
