@@ -5,6 +5,7 @@
 electron-packager . --platform=linux --arch=x64 \
   --icon=assets/icons/agama_icons/128x128.png \
   --out=build/ \
+  --ignore=Verus* \
   --ignore=assets/bin/win64 \
   --ignore=assets/bin/osx \
   --ignore=react/node_modules \
