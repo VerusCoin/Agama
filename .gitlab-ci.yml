@@ -40,7 +40,7 @@ build:linux:
     else
       export CLI_BRANCH="$CI_COMMIT_REF_NAME"
       export VERUS_CLI_LINUX="$DEFAULT_VERUS_CLI_LINUX"
-    :fi
+    fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
@@ -81,7 +81,7 @@ build:windows:
     else
       export CLI_BRANCH="$CI_COMMIT_REF_NAME"
       export VERUS_CLI_WINDOWS="$DEFAULT_VERUS_CLI_WINDOWS"
-    :fi
+    fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
@@ -108,8 +108,8 @@ build:mac:
   tags: ["High Sierra"]
   before_script:
   - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
-    echo "No builds found in $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_EASYDEXGUI_BRANCH" &&
-    gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
+      echo "No builds found in $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_EASYDEXGUI_BRANCH" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
   - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
       rm $EASYDEX_GUI_BUILD
   - if [ -z "$UPSTREAM_CLI_BRANCH" ]; then
@@ -117,7 +117,7 @@ build:mac:
     else
       export CLI_BRANCH="$CI_COMMIT_REF_NAME"
       export VERUS_CLI_MACOS="$DEFAULT_VERUS_CLI_MACOS"
-    :fi
+    fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH"
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/MacOS/$VERUS_CLI_MACOS . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_VERUSCOIN_BRANCH branch" &&
@@ -145,7 +145,7 @@ deploy:
   - build:mac
   before_script:
   - 'if [ -z "$UPSTREAM_CLI_BRANCH" ]; then
-      export POST_COMMENT="VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}":fi'
+      export POST_COMMENT="VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}"fi'
   - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
   - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
   - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
