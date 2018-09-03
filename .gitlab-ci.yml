@@ -36,10 +36,10 @@ build:linux:
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
       gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Linux/$VERUS_CLI_LINUX .
-  - mkdir -p assets/bin/ &&
-      tar -xzf $VERUS_CLI_LINUX --directory  $ELECTRON_BUILD_LINUX/resources/app/assets/bin/ &&
-      rm $VERUS_CLI_LINUX &&
-      mv $ELECTRON_BUILD_LINUX/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_LINUX/resources/app/assets/bin/linux64
+  - mkdir -p assets/bin/
+  - tar -xzf $VERUS_CLI_LINUX --directory  $ELECTRON_BUILD_LINUX/resources/app/assets/bin/
+  - rm $VERUS_CLI_LINUX
+  - mv $ELECTRON_BUILD_LINUX/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_LINUX/resources/app/assets/bin/linux64
   script:
   - npm install electron-packager -g
   - npm install electron -g --unsafe-perm=true
@@ -73,10 +73,10 @@ build:windows:
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
       gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS .
-  - mkdir -p assets/bin/ &&
-      unzip -qq $VERUS_CLI_WINDOWS -d $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/ &&
-      rm $VERUS_CLI_WINDOWS &&
-      mv $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/win64
+  - mkdir -p assets/bin/
+  - unzip -qq $VERUS_CLI_WINDOWS -d $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/
+  - rm $VERUS_CLI_WINDOWS
+  - mv $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/win64
   script:
   - npm install electron-packager -g
   - npm install electron -g --unsafe-perm=true
@@ -105,11 +105,10 @@ build:mac:
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/MacOS/$VERUS_CLI_MACOS . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_VERUSCOIN_BRANCH branch" &&
       gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/MacOS/$VERUS_CLI_MACOS .
-  - mkdir -p assets/bin/ &&
-      gsutil cp $STAGING/Agama/$CLI_BRANCH/MacOS/$AGAMA_MACOS . &&
-      tar -xzf $VERUS_CLI_MACOS --directory  $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/ &&
-      rm $VERUS_CLI_MACOS &&
-      mv $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/verus-cli $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/osx
+  - mkdir -p assets/bin/
+  - tar -xzf $VERUS_CLI_MACOS --directory  $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/ &&
+  - rm $VERUS_CLI_MACOS &&
+  - mv $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/verus-cli $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/osx
   script:
   - npm install
   - npm install electron-packager -g
