@@ -101,10 +101,10 @@ build:mac:
       gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
   - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
       rm $EASYDEX_GUI_BUILD
-  - echo "fetching builds from VerusCoin:$CLI_BRANCH"
+  - echo "fetching builds from VerusCoin:$CLI_BRANCH" && 
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/MacOS/$VERUS_CLI_MACOS . ||
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_VERUSCOIN_BRANCH branch" &&
-      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Linux/$VERUS_CLI_MACOS .
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Macos/$VERUS_CLI_MACOS .
   - mkdir -p assets/bin/ &&
       gsutil cp $STAGING/Agama/$CLI_BRANCH/MacOS/$AGAMA_MACOS . &&
       tar -xzf $VERUS_CLI_MACOS --directory  $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/ &&
