@@ -76,7 +76,7 @@ build:windows:
   - mkdir -p assets/bin/
   - unzip -qq $VERUS_CLI_WINDOWS -d assets/bin/
   - rm $VERUS_CLI_WINDOWS
-  - mv assets/bin/verus-cli /assets/bin/win64
+  - mv assets/bin/verus-cli assets/bin/win64
   script:
   - npm install electron-packager -g
   - npm install electron -g --unsafe-perm=true
