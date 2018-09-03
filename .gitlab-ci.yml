@@ -147,12 +147,12 @@ deploy:
       -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
-  - mkdir -p $CI_COMMIT_REF_NAME/Windows &&
-      mkdir -p $CI_COMMIT_REF_NAME/Linux &&
-      mkdir -p $CI_COMMIT_REF_NAME/MacOS &&
-      mv $AGAMA_LINUX $CI_COMMIT_REF_NAME/Linux &&
-      mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows &&
-      mv $AGAMA_OSX $CI_COMMIT_REF_NAME/MacOS
+  - mkdir -p $CI_COMMIT_REF_NAME/Windows
+  - mkdir -p $CI_COMMIT_REF_NAME/Linux
+  - mkdir -p $CI_COMMIT_REF_NAME/MacOS
+  - mv $AGAMA_LINUX $CI_COMMIT_REF_NAME/Linux
+  - mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows
+  - mv $AGAMA_OSX $CI_COMMIT_REF_NAME/MacOS
   - echo $AUTH_KEY > AUTH_KEY.json
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
