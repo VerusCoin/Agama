@@ -27,6 +27,7 @@ electron-packager . --platform=darwin \
   --ignore=version_build \
   --prune=true \
   --overwrite  \
+  --buildVersion="$AGAMA_VERSION"-beta \
   --version-string.CompanyName="VerusCoin" \
   --version-string.FileDescription="Agama" \
   --version-string.OriginalFilename="Agama" \
