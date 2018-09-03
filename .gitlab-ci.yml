@@ -20,8 +20,8 @@ build:linux:
   image: asherd/agama-builder
   stage: build
   before_script:
-  - 'export VERUS_CLI_LINUX=(if [ -z "${VERUS_CLI_LINUX}" ]; then "Verus-CLI-Linux-v${AGAMA_VERSION}-beta.tar.gz" else ${DEFAULT_VERUS_CLI_LINUX}; fi)'
-  - 'export CLI_BRANCH=(if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then "${CI_COMMIT_REF_NAME}" else $UPSTREAM_CLI_BRANCH}; fi)'
+  - if [ -z "${VERUS_CLI_LINUX}" ]; then export VERUS_CLI_LINUX="Verus-CLI-Linux-v${AGAMA_VERSION}-beta.tar.gz"; fi)
+  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi)
   - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
