@@ -133,7 +133,7 @@ deploy:
   script:
   - curl -F file=@"$AGAMA_LINUX"
       -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
+      -F initial_comment="${POST_COMMENT} $AGAMA_LINUX_MD5"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - curl -F file=@"$AGAMA_WINDOWS"
