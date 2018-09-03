@@ -4,113 +4,119 @@ stages:
   - deploy
 variables:
   DOCKER_DRIVER: overlay2
+  DEFAULT_CLI_BRANCH: dev
+  DEFAULT_EASYDEXGUI_BRANCH: dev
   AGAMA_VERSION: 0.3.13
-  EASYDEX_GUI_ARTIFACT: build.tar.gz
-  AGAMA_ARTIFACTS_LINUX: linux64.tar.gz
-  AGAMA_ARTIFACTS_MACOS: osx.tar.gz
-  AGAMA_ARTIFACTS_WINDOWS: win64.zip
+  EASYDEX_GUI_BUILD: build.tar.gz
   ELECTRON_BUILD_LINUX: Agama-linux-x64
   ELECTRON_BUILD_WINDOWS: Agama-win32-x64
-  ELECTRON_BUILD_OSX: Agama-darwin-x64
-  AGAMA_LINUX_PORTABLE: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}-beta.tar.gz
-  AGAMA_WINDOWS_PORTABLE: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
-  AGAMA_OSX_PORTABLE: ${ELECTRON_BUILD_OSX}-v${AGAMA_VERSION}-beta.tar.gz
+  ELECTRON_BUILD_MACOS: Agama-darwin-x64
+  AGAMA_LINUX: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}-beta.tar.gz
+  AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
+  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-
+  POST_COMMENT: "$'\n'Agama Branch and Commit: ${CI_COMMIT_REF_NAME} ${CI_COMMIT_SHA} $'\n'MD5: "
 build:linux:
   image: asherd/agama-builder
   stage: build
   before_script:
-    - echo "$AUTH_KEY" > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/Linux/$AGAMA_ARTIFACTS_LINUX . || gsutil cp $STAGING/VerusCoin/master/Linux/$AGAMA_ARTIFACTS_LINUX .
-    - mkdir -p assets/bin/
-    - tar -xzf $AGAMA_ARTIFACTS_LINUX --directory  assets/bin/ && ls assets/bin
-    - rm $AGAMA_ARTIFACTS_LINUX
-
-
+  - if [ -z "${VERUS_CLI_LINUX}" ]; then export VERUS_CLI_LINUX="Verus-CLI-Linux-v${AGAMA_VERSION}-beta.tar.gz"; fi
+  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
+  - echo "$AUTH_KEY" > AUTH_KEY.json &&
+      gcloud auth activate-service-account
+      --key-file AUTH_KEY.json &&
+      rm AUTH_KEY.json
+  - echo "fetching latest build from  EasyDEX-GUI:$CI_COMMIT_REF_NAME" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
+      echo "No builds found in $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_EASYDEXGUI_BRANCH branch" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
+      rm $EASYDEX_GUI_BUILD
+  - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
+      gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX . ||
+      echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Linux/$VERUS_CLI_LINUX .
+  - mkdir -p assets/bin/ &&
+      tar -xzf $VERUS_CLI_LINUX --directory  $ELECTRON_BUILD_LINUX/resources/app/assets/bin/ &&
+      rm $VERUS_CLI_LINUX &&
+      mv $ELECTRON_BUILD_LINUX/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_LINUX/resources/app/assets/bin/linux64
   script:
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-linux.sh
-    - cd build
-    - tar -czf $AGAMA_LINUX_PORTABLE $ELECTRON_BUILD_LINUX
-    - mv $AGAMA_LINUX_PORTABLE ..
+  - npm install electron-packager -g
+  - npm install electron -g --unsafe-perm=true
+  - npm install
+  - npm run package-linux
+  - cd build
+  - tar -czf $AGAMA_LINUX $ELECTRON_BUILD_LINUX
+  - mv $AGAMA_LINUX ..
   artifacts:
-    paths:
-    - $AGAMA_LINUX_PORTABLE
+    paths: [$AGAMA_LINUX]
     expire_in: 1 week
+
 
 build:windows:
   stage: build
-  image: asherd/agama-builder
+  image: asherd/agama-builder:windows
   before_script:
-    - echo $AUTH_KEY > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/Windows/$AGAMA_ARTIFACTS_WINDOWS . || gsutil cp $STAGING/VerusCoin/master/Windows/$AGAMA_ARTIFACTS_WINDOWS .
-    - mkdir -p assets/bin/
-    - unzip $AGAMA_ARTIFACTS_WINDOWS -d assets/bin/ && ls assets/bin
-    - rm $AGAMA_ARTIFACTS_WINDOWS
-    - ./binary_artifacts_win.sh
-
+  - if [ -z "${VERUS_CLI_WINDOWS}" ]; then export VERUS_CLI_WINDOWS="Verus-CLI-Windows-v${AGAMA_VERSION}-beta.zip"; fi
+  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
+  - echo "$AUTH_KEY" > AUTH_KEY.json &&
+      gcloud auth activate-service-account
+      --key-file AUTH_KEY.json &&
+      rm AUTH_KEY.json
+  - echo "fetching latest build from  EasyDEX-GUI:$CI_COMMIT_REF_NAME"
+  - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
+      echo "No builds found in $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_EASYDEXGUI_BRANCH branch" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
+      rm $EASYDEX_GUI_BUILD
+  - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
+      gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS . ||
+      echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS .
+  - mkdir -p assets/bin/ &&
+      unzip -qq $VERUS_CLI_WINDOWS -d $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/ &&
+      rm $VERUS_CLI_WINDOWS &&
+      mv $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/verus-cli $ELECTRON_BUILD_WINDOWS/resources/app/assets/bin/win64
   script:
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-windows.sh
-    - cd build
-    - zip -r $AGAMA_WINDOWS_PORTABLE $ELECTRON_BUILD_WINDOWS
-    - mv $AGAMA_WINDOWS_PORTABLE ..
+  - npm install electron-packager -g
+  - npm install electron -g --unsafe-perm=true
+  - npm install
+  - npm run package-windows
+  - cd build
+  - zip -r $AGAMA_WINDOWS $ELECTRON_BUILD_WINDOWS
+  - mv $AGAMA_WINDOWS ..
   artifacts:
-    paths:
-    - $AGAMA_WINDOWS_PORTABLE
+    paths: [$AGAMA_WINDOWS]
     expire_in: 1 week
+
 
 build:mac:
   stage: build
-  image: asherd/agama-builder
+  tags: ["High Sierra"]
   before_script:
-    - echo "$AUTH_KEY" > AUTH_KEY.json
-    - gcloud auth activate-service-account --key-file AUTH_KEY.json
-    - rm AUTH_KEY.json
-    - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_ARTIFACT . || gsutil cp $STAGING/EasyDEX-GUI/master/$EASYDEX_GUI_ARTIFACT .
-    - tar -xzf $EASYDEX_GUI_ARTIFACT --directory gui/EasyDEX-GUI/react
-    - rm $EASYDEX_GUI_ARTIFACT
-    - gsutil cp $STAGING/VerusCoin/$CI_COMMIT_REF_NAME/MacOS/$AGAMA_ARTIFACTS_MACOS . || gsutil cp $STAGING/VerusCoin/master/MacOS/$AGAMA_ARTIFACTS_MACOS .
-    - mkdir -p assets/bin/
-    - tar -xzf $AGAMA_ARTIFACTS_MACOS --directory  assets/bin/
-    - rm $AGAMA_ARTIFACTS_MACOS
-    
-  script: 
-    - npm install electron-packager -g
-    - npm install electron -g --unsafe-perm=true
-    - npm install
-    - ./buildscripts/electron-build-osx.sh
-    - cd build
-    - tar -czf $AGAMA_OSX_PORTABLE $ELECTRON_BUILD_OSX
-    - mv $AGAMA_OSX_PORTABLE ..
-  artifacts:
-    paths:
-    - $AGAMA_OSX_PORTABLE
-    expire_in: 1 week
-    
-
-
-.test:
-  stage: test
-  image: node:8.11.3
+  - if [ -z  "${VERUS_CLI_MACOS}" ]; then export VERUS_CLI_MACOS="Verus-CLI-MacOS-v${AGAMA_VERSION}-beta.tar.gz"; fi
+  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
+  - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
+      echo "No builds found in $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_EASYDEXGUI_BRANCH" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
+  - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
+      rm $EASYDEX_GUI_BUILD
+  - echo "fetching builds from VerusCoin:$CLI_BRANCH"
+      gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/MacOS/$VERUS_CLI_MACOS . ||
+      echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_VERUSCOIN_BRANCH branch" &&
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Linux/$VERUS_CLI_MACOS .
+  - mkdir -p assets/bin/ &&
+      gsutil cp $STAGING/Agama/$CLI_BRANCH/MacOS/$AGAMA_MACOS . &&
+      tar -xzf $VERUS_CLI_MACOS --directory  $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/ &&
+      rm $VERUS_CLI_MACOS &&
+      mv $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/verus-cli $ELECTRON_BUILD_MACOS/Agama.app/Contents/Resources/app/assets/bin/osx
   script:
-    - npm install
-    - npm test
+  - npm install electron-packager -g
+  - npm run package-mac
+  - npm run create-installer-mac
+  artifacts:
+    paths: [$AGAMA_MACOS.dmg]
+    expire_in: 1 week
 
 
 deploy:
@@ -120,13 +126,35 @@ deploy:
   - build:linux
   - build:windows
   - build:mac
+  before_script:
+  - 'if [ -z "$UPSTREAM_CLI_BRANCH" ]; then export POST_COMMENT="${POST_COMMENT}"; else export POST_COMMENT="VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}"; fi'
+  - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
+  - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
+  - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
   script:
-  - mkdir -p $CI_COMMIT_REF_NAME/Windows
-  - mkdir -p $CI_COMMIT_REF_NAME/Linux
-  - mkdir -p $CI_COMMIT_REF_NAME/MacOS
-  - mv $AGAMA_LINUX_PORTABLE $CI_COMMIT_REF_NAME/Linux
-  - mv $AGAMA_WINDOWS_PORTABLE $CI_COMMIT_REF_NAME/Windows
-  - mv $AGAMA_OSX_PORTABLE $CI_COMMIT_REF_NAME/MacOS
+  - curl -F file=@"$AGAMA_LINUX"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  - curl -F file=@"$AGAMA_WINDOWS"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT} $AGAMA_WINDOWS_MD5"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  - curl -F file=@"$AGAMA_MACOS.dmg"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
+  - mkdir -p $CI_COMMIT_REF_NAME/Windows &&
+      mkdir -p $CI_COMMIT_REF_NAME/Linux &&
+      mkdir -p $CI_COMMIT_REF_NAME/MacOS &&
+      mv $AGAMA_LINUX $CI_COMMIT_REF_NAME/Linux &&
+      mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows &&
+      mv $AGAMA_OSX $CI_COMMIT_REF_NAME/MacOS
   - echo $AUTH_KEY > AUTH_KEY.json
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
+
+

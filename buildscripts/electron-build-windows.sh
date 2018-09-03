@@ -2,7 +2,8 @@
 ### Build script for Agama application for Windows x64 platform.
 ### Created by mmaxian, 3/2017; updated by David Dawes 5/2018; updated by Asher Dawes 7/2018
 
-electron-packager . --platform=win32 \
+electron-packager . agama --platform=win32 \
+  --asar=true \
   --arch=x64 \
   --icon=assets/icons/agama_app_icon.ico \
   --out=build/ \
@@ -27,6 +28,7 @@ electron-packager . --platform=win32 \
   --ignore=version_build \
   --prune=true \
   --overwrite \
+  --buildVersion="$AGAMA_VERSION"-beta \
   --version-string.CompanyName="VerusCoin" \
   --version-string.FileDescription="Agama" \
   --version-string.OriginalFilename="Agama" \

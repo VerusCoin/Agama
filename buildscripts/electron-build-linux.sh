@@ -4,6 +4,7 @@
 
 electron-packager . --platform=linux --arch=x64 \
   --icon=assets/icons/agama_icons/128x128.png \
+  --asar=true \
   --out=build/ \
   --ignore=assets/bin/win64 \
   --ignore=assets/bin/osx \
@@ -26,6 +27,7 @@ electron-packager . --platform=linux --arch=x64 \
   --ignore=version_build \
   --prune=true \
   --overwrite  \
+  --buildVersion="$AGAMA_VERSION"-beta \
   --version-string.CompanyName="VerusCoin" \
   --version-string.FileDescription="Agama" \
   --version-string.OriginalFilename="Agama" \

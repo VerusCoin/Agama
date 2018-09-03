@@ -10,8 +10,10 @@
     "make-rpm": "node make-rpm.js",
     "make-deb": "node make-deb.js",
     "test": "mocha",
-    "package-mac": "electron-packager . agama --platform=darwin --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.icns --prune=true ---buildVersion=0.4.0-beta --out=build/ --ignore=assets/bin/win64 --ignore=assets/bin/linux64 --overwrite",
-    "package-win": "electron-packager . agama --overwrite --asar=true --platform=win32 --arch=x64 --icon=assets/icons/agama_icons/agama_app_icon.ico --out=build/ --buildVersion=0.4.0-beta --ignore=assets/bin/osx --ignore=assets/bin/linux64 --overwrite"
+    "package-linux": "./buildscripts/electron-build-linux.sh",
+    "package-mac": "./buildscripts/electron-build-osx.sh",
+    "package-win": "./buildscripts/electron-build-windows.sh",
+    "create-installer-mac": "electron-installer-dmg build/$ELECTRON_BUILD_MACOS/Agama.app $AGAMA_MACOS --icon=assets/icons/agama_icons/agama_app_icon.icns --background=assets/backgrounds/trianglify-8.png"
   },
   "repository": "https://github.com/KomodoPlatform/Agama/",
   "homepage": "http://komodoplatform.com",
@@ -40,6 +42,7 @@
     "adm-zip": "^0.4.7",
     "agama-wallet-lib": "git+https://github.com/VerusCoin/agama-wallet-lib.git",
     "arch": "^2.1.0",
+    "asar": "^0.14.3",
     "async": "^2.6.0",
     "bigi": "^1.4.2",
     "bip39": "^2.5.0",
