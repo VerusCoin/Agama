@@ -15,7 +15,7 @@ variables:
   AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-  POST_COMMENT: "$'\n'Agama Branch and Commit: ${CI_COMMIT_REF_NAME} ${CI_COMMIT_SHA} $'\n'MD5: "
+  POST_COMMENT: "$\n Agama Branch and Commit: ${CI_COMMIT_REF_NAME} ${CI_COMMIT_SHA} $'\n'MD5: "
 build:linux:
   image: asherd/agama-builder
   stage: build
