@@ -11,6 +11,7 @@ const appConfig = {
     roundValues: false,
     experimentalFeatures: false,
     dataDir: '',
+    autoStartVRSC: false,
     dex: {
       walletUnlockTimeout: 3600,
     },
@@ -82,6 +83,12 @@ const appConfig = {
       display: true,
       initDisplay: true,
       displayName: 'Enable advanced features',
+      type: 'boolean',
+    },
+    autoStartVRSC: {
+      display: true,
+      initDisplay: true,
+      displayName: 'Automatically start VerusCoin on launch',
       type: 'boolean',
     },
     dataDir: {

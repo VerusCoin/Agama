@@ -89,7 +89,7 @@ module.exports = (shepherd) => {
             shepherd.log(`timeout while trying to safely quit ${key}, force quitting`);
             execCliStopForce();
           }
-        }, 10000)
+        }, 60000)
       } else {
         delete shepherd.coindInstanceRegistry[key];
       }
