@@ -15,7 +15,7 @@ variables:
   AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-  POST_COMMENT: (if [ -z "$UPSTREAM_CLI_BRANCH" ]; then "${POST_COMMENT}"; else "VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}")
+  POST_COMMENT: (if [ -z "$UPSTREAM_CLI_BRANCH" ]; then "${POST_COMMENT}"; else "VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}"; fi);
   VERUS_CLI_LINUX: (if [ -z "${VERUS_CLI_LINUX}" ]; then "Verus-CLI-Linux-v${AGAMA_VERSION}-beta.tar.gz"; else ${VERUS_CLI_LINUX}; fi);
   VERUS_CLI_WINDOWS: (if [ -z "${VERUS_CLI_WINDOWS}" ]; then "Verus-CLI-Windows-v${AGAMA_VERSION}-beta.zip"; else ${VERUS_CLI_WINDOWS}; fi);
   VERUS_CLI_MACOS: (if [ -z  "${VERUS_CLI_MACOS}" ]; then "Verus-CLI-MacOS-v${AGAMA_VERSION}-beta.tar.gz"; else ${VERUS_CLI_MACOS}; fi);
