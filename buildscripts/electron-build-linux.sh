@@ -4,7 +4,6 @@
 
 electron-packager . --platform=linux --arch=x64 \
   --icon=assets/icons/agama_icons/128x128.png \
-  --asar=true \
   --out=build/ \
   --ignore=assets/bin/win64 \
   --ignore=assets/bin/osx \
