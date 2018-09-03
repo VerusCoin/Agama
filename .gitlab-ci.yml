@@ -74,7 +74,7 @@ build:windows:
       echo "No matching artifacts found in $CLI_BRANCH branch, fetching from $DEFAULT_CLI_BRANCH branch" &&
       gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS .
   - mkdir -p assets/bin/
-  - unzip -qq $VERUS_CLI_WINDOWS -d $ELECTRON_BUILD_WINDOWS/assets/bin/
+  - unzip -qq $VERUS_CLI_WINDOWS -d assets/bin/
   - rm $VERUS_CLI_WINDOWS
   - mv assets/bin/verus-cli /assets/bin/win64
   script:
