@@ -128,7 +128,6 @@ deploy:
   - build:windows
   - build:mac
   before_script:
-  - 'if [ -z "$UPSTREAM_CLI_BRANCH" ]; then export POST_COMMENT="${POST_COMMENT}"; else export POST_COMMENT="VerusCoin Branch and Commit: ${UPSTREAM_CLI_BRANCH} $(UPSTREAM_CLI_COMMIT}${POST_COMMENT}"; fi'
   - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
   - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
   - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)

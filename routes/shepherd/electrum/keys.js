@@ -16,7 +16,7 @@ module.exports = (shepherd) => {
       pub: key.getAddress(),
       priv: key.toWIF(),
     };
-  }
+  };
 
   shepherd.seedToWif = (seed, network, iguana) => {
     let bytes;
@@ -68,7 +68,7 @@ module.exports = (shepherd) => {
     shepherd.log(`seedtowif pub key ${keys.pub}`, true);*/
 
     return keys;
-  }
+  };
 
   shepherd.get('/electrum/wiftopub', (req, res, next) => {
     if (shepherd.checkToken(req.query.token)) {
