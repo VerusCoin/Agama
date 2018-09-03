@@ -13,7 +13,7 @@
     "package-linux": "./buildscripts/electron-build-linux.sh",
     "package-mac": "./buildscripts/electron-build-osx.sh",
     "package-win": "./buildscripts/electron-build-windows.sh",
-    "create-installer-mac": "electron-installer-dmg build/$ELECTRON_BUILD_MACOS/Agama.app $AGAMA_MACOS --icon=assets/icons/agama_icons/agama_app_icon.icns --background=assets/backgrounds/trianglify-8.png"
+    "create-installer-mac": "electron-installer-dmg build/$ELECTRON_BUILD_MACOS/Agama.app $AGAMA_MACOS --icon=assets/icons/agama_icons/agama_app_icon.icns"
   },
   "repository": "https://github.com/KomodoPlatform/Agama/",
   "homepage": "http://komodoplatform.com",
