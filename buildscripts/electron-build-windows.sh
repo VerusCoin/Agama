@@ -3,7 +3,6 @@
 ### Created by mmaxian, 3/2017; updated by David Dawes 5/2018; updated by Asher Dawes 7/2018
 
 electron-packager . --platform=win32 \
-  --asar=true \
   --arch=x64 \
   --icon=assets/icons/agama_app_icon.ico \
   --out=build/ \
