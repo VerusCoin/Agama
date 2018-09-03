@@ -38,7 +38,7 @@ build:linux:
   - if [ -z "$UPSTREAM_CLI_BRANCH" ]; then
       export CLI_BRANCH="$UPSTREAM_CLI_BRANCH"
     else
-      export CLI_BRANCH="$CI_COMMIT_REF_NAME"
+      export CLI_BRANCH="$CI_COMMIT_REF_NAME" &&
       export VERUS_CLI_LINUX="$DEFAULT_VERUS_CLI_LINUX"
     fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
@@ -79,7 +79,7 @@ build:windows:
   - if [ -z "$UPSTREAM_CLI_BRANCH" ]; then
       export CLI_BRANCH="$UPSTREAM_CLI_BRANCH"
     else
-      export CLI_BRANCH="$CI_COMMIT_REF_NAME"
+      export CLI_BRANCH="$CI_COMMIT_REF_NAME" &&
       export VERUS_CLI_WINDOWS="$DEFAULT_VERUS_CLI_WINDOWS"
     fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
@@ -115,7 +115,7 @@ build:mac:
   - if [ -z "$UPSTREAM_CLI_BRANCH" ]; then
       export CLI_BRANCH="$UPSTREAM_CLI_BRANCH"
     else
-      export CLI_BRANCH="$CI_COMMIT_REF_NAME"
+      export CLI_BRANCH="$CI_COMMIT_REF_NAME" && 
       export VERUS_CLI_MACOS="$DEFAULT_VERUS_CLI_MACOS"
     fi
   - echo "fetching builds from VerusCoin:$CLI_BRANCH"
