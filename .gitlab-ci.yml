@@ -2,11 +2,14 @@ stages:
   - build
   - test
   - deploy
+
+
 variables:
   DOCKER_DRIVER: overlay2
-  DEFAULT_CLI_BRANCH: dev
+  DEFAULT_VERUSCOIN_BRANCH: dev
   DEFAULT_EASYDEXGUI_BRANCH: dev
-  AGAMA_VERSION: 0.3.13c
+  AGAMA_VERSION: 0.3.14
+  VERUSCOIN_VERSION: 0.3.14
   EASYDEX_GUI_BUILD: build.tar.gz
   ELECTRON_BUILD_LINUX: Agama-linux-x64
   ELECTRON_BUILD_WINDOWS: Agama-win32-x64
@@ -15,25 +18,29 @@ variables:
   AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-  POST_COMMENT: "$\n Agama Branch and Commit: ${CI_COMMIT_REF_NAME} $\n${CI_COMMIT_SHA} $\nMD5: "
+
+
 build:linux:
   image: asherd/agama-builder
   stage: build
   before_script:
-  - if [ -z "${VERUS_CLI_LINUX}" ]; then export VERUS_CLI_LINUX="Verus-CLI-Linux-v${AGAMA_VERSION}-beta.tar.gz"; fi
-  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
+  - if [ -z "${VERUS_CLI_LINUX}" ]; then export VERUS_CLI_LINUX="Verus-CLI-Linux-v${VERUSCOIN_VERSION}-beta.tar.gz"; fi
+  - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME;
+      else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
   - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
       rm AUTH_KEY.json
-  - echo "fetching latest build from  EasyDEX-GUI:$CI_COMMIT_REF_NAME" &&
-      gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
-      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
+  - (echo "fetching latest build from  EasyDEX-GUI:$CI_COMMIT_REF_NAME" &&
+      gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD .) ||
+      (No EasyDEX-GUI builds available from the $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_VERUSCOIN_BRANCH &&
+      gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .)
   - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
       rm $EASYDEX_GUI_BUILD
-  - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
-      gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX . ||
-      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Linux/$VERUS_CLI_LINUX .
+  - (echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
+      gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX .) ||
+      (No VerusCoin builds available from the $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_VERUSCOIN_BRANCH &&
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_VERUSCOIN_BRANCH/Linux/$VERUS_CLI_LINUX .)
   - mkdir -p assets/bin/
   - tar -xzf $VERUS_CLI_LINUX --directory assets/bin/
   - rm $VERUS_CLI_LINUX
@@ -55,7 +62,7 @@ build:windows:
   stage: build
   image: asherd/agama-builder:windows
   before_script:
-  - if [ -z "${VERUS_CLI_WINDOWS}" ]; then export VERUS_CLI_WINDOWS="Verus-CLI-Windows-v${AGAMA_VERSION}-beta.zip"; fi
+  - if [ -z "${VERUS_CLI_WINDOWS}" ]; then export VERUS_CLI_WINDOWS="Verus-CLI-Windows-v${VERUSCOIN_VERSION}-beta.zip"; fi
   - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
   - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
@@ -68,7 +75,7 @@ build:windows:
       rm $EASYDEX_GUI_BUILD
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS . ||
-      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/Windows/$VERUS_CLI_WINDOWS .
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_VERUSCOIN_BRANCH/Windows/$VERUS_CLI_WINDOWS .
   - mkdir -p assets/bin/
   - unzip -qq $VERUS_CLI_WINDOWS -d assets/bin/
   - rm $VERUS_CLI_WINDOWS
@@ -90,7 +97,7 @@ build:mac:
   stage: build
   tags: ["High Sierra"]
   before_script:
-  - if [ -z  "${VERUS_CLI_MACOS}" ]; then export VERUS_CLI_MACOS="Verus-CLI-MacOS-v${AGAMA_VERSION}-beta.tar.gz"; fi
+  - if [ -z  "${VERUS_CLI_MACOS}" ]; then export VERUS_CLI_MACOS="Verus-CLI-MacOS-v${VERUSCOIN_VERSION}-beta.tar.gz"; fi
   - if [ -z "${UPSTREAM_CLI_BRANCH}" ]; then export CLI_BRANCH=$CI_COMMIT_REF_NAME; else export CLI_BRANCH=$UPSTREAM_CLI_BRANCH; fi
   - gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD . ||
       gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .
@@ -98,7 +105,7 @@ build:mac:
       rm $EASYDEX_GUI_BUILD
   - echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/MacOS/$VERUS_CLI_MACOS . ||
-      gsutil cp $STAGING/VerusCoin/$DEFAULT_CLI_BRANCH/MacOS/$VERUS_CLI_MACOS .
+      gsutil cp $STAGING/VerusCoin/$DEFAULT_VERUSCOIN_BRANCH/MacOS/$VERUS_CLI_MACOS .
   - mkdir -p assets/bin/
   - tar -xzf $VERUS_CLI_MACOS --directory assets/bin/
   - rm $VERUS_CLI_MACOS
@@ -121,23 +128,26 @@ deploy:
   - build:windows
   - build:mac
   before_script:
+  - export COMMIT_MESSAGE="$(git log -1 --pretty)"
+  - 'export POST_COMMENT="Branch: ${CI_COMMIT_REF_NAME} | ${COMMIT_MESSAGE}"'
+  - if [ -z "${UPSTREAM_TRIGGER_INFO}" ]; then export POST_COMMENT=$POST_COMMENT; else export POST_COMMENT="${UPSTREAM_TRIGGER_INFO} $\n ${POST_COMMENT}"; fi
   - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
   - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
   - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
   script:
   - curl -F file=@"$AGAMA_LINUX"
       -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_LINUX_MD5"
+      -F initial_comment="${POST_COMMENT}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - curl -F file=@"$AGAMA_WINDOWS"
       -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_WINDOWS_MD5"
+      -F initial_comment="${POST_COMMENT}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - curl -F file=@"$AGAMA_MACOS.dmg"
       -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
+      -F initial_comment="${POST_COMMENT}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - mkdir -p $CI_COMMIT_REF_NAME/Windows
