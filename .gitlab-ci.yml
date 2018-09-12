@@ -129,9 +129,8 @@ deploy:
   - build:mac
   before_script:
   - export COMMIT_MESSAGE="$(git log -1 --pretty)"
-  - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}$\n${COMMIT_MESSAGE}"
-  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}
-      ${POST_COMMENT}"
+  - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}\n${COMMIT_MESSAGE}"
+  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}\n${POST_COMMENT}"
   - echo $POST_COMMENT
   - echo -e $POST_COMMENT
   - echo "${POST_COMMENT}"
@@ -161,7 +160,7 @@ deploy:
   - mv ${AGAMA_LINUX} ${CI_COMMIT_REF_NAME}/Linux
   - mv ${AGAMA_WINDOWS} ${CI_COMMIT_REF_NAME}/Windows
   - mv ${AGAMA_MACOS}.dmg ${CI_COMMIT_REF_NAME}/MacOS
-  - echo $AUTH_KEY > AUTH_KEY.json
+  - echo ${AUTH_KEY} > AUTH_KEY.json
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
 
