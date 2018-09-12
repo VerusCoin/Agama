@@ -18,7 +18,13 @@ variables:
   AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-
+  POST_MESSAGE: " ${UPSTREAM_TRIGGER_INFO}$\n
+      Pipeline Trigger: ${CI_PIPELINE_SOURCE}$\n
+      Branch: ${CI_COMMIT_REF_NAME}$\n
+      Commit: ${CI_COMMIT_SHA}$\n
+      Author:  ${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>$\n
+      ${CI_COMMIT_TITLE}$\n
+      ${CI_COMMIT_MESSAGE}"
 
 build:linux:
   image: asherd/agama-builder
@@ -130,7 +136,6 @@ deploy:
   before_script:
   - export COMMIT_MESSAGE="$(git log -1 --pretty)"
   - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}\n${COMMIT_MESSAGE}"
-  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}\n${POST_COMMENT}"
   - echo $POST_COMMENT
   - echo -e $POST_COMMENT
   - echo "${POST_COMMENT}"
@@ -141,17 +146,17 @@ deploy:
   script:
   - curl -F file=@"${AGAMA_LINUX}"
       -F channels="${AGAMA_POST_CHANNEL}"
-      -F initial_comment='${POST_COMMENT}'
+      -F initial_comment='${POST_MESSAGE}'
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - curl -F file=@"${AGAMA_WINDOWS}"
       -F channels="${AGAMA_POST_CHANNEL}"
-      -F initial_comment="${POST_COMMENT}"
+      -F initial_comment="${POST_MESSAGE}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - curl -F file=@"${AGAMA_MACOS}.dmg"
       -F channels="${AGAMA_POST_CHANNEL}"
-      -F initial_comment="${POST_COMMENT}"
+      -F initial_comment="${POST_MESSAGE}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
   - mkdir -p ${CI_COMMIT_REF_NAME}/Windows
