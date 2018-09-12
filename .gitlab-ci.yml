@@ -129,7 +129,7 @@ deploy:
   - build:mac
   before_script:
   - export COMMIT_MESSAGE="$(git log -1 --pretty)"
-  - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}$\n"${COMMIT_MESSAGE}"
+  - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}$\n${COMMIT_MESSAGE}"
   - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}
       ${POST_COMMENT}"
   - echo $POST_COMMENT
