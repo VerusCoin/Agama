@@ -130,7 +130,7 @@ deploy:
   before_script:
   - export COMMIT_MESSAGE="$(git log -1 --pretty)"
   - 'export POST_COMMENT="Branch: ${CI_COMMIT_REF_NAME} | ${COMMIT_MESSAGE}"'
-  - if [ -z "${UPSTREAM_TRIGGER_INFO}" ]; then export POST_COMMENT=$POST_COMMENT; else export POST_COMMENT="${UPSTREAM_TRIGGER_INFO} | ${POST_COMMENT}"; fi
+  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO} $'\n' ${POST_COMMENT}"
   - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
   - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
   - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
