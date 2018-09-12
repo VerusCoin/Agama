@@ -129,8 +129,13 @@ deploy:
   - build:mac
   before_script:
   - export COMMIT_MESSAGE="$(git log -1 --pretty)"
-  - 'export POST_COMMENT="Branch: ${CI_COMMIT_REF_NAME}"$"\n""${COMMIT_MESSAGE}"'
-  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}"$"\n""${POST_COMMENT}"
+  - export POST_COMMENT="Branch ${CI_COMMIT_REF_NAME}$\n"${COMMIT_MESSAGE}"
+  - export POST_COMMENT="${UPSTREAM_TRIGGER_INFO}
+      ${POST_COMMENT}"
+  - echo $POST_COMMENT
+  - echo -e $POST_COMMENT
+  - echo "${POST_COMMENT}"
+  - echo -e "${POST_COMMENT}"
   - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
   - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
   - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
@@ -140,7 +145,7 @@ deploy:
       -F initial_comment="${POST_COMMENT}"
       -H "${SLACK_BOT_AUTH}"
       "https://slack.com/api/files.upload"
-  - curl -F file=@"{AGAMA_WINDOWS}"
+  - curl -F file=@"${AGAMA_WINDOWS}"
       -F channels="${AGAMA_POST_CHANNEL}"
       -F initial_comment="${POST_COMMENT}"
       -H "${SLACK_BOT_AUTH}"
