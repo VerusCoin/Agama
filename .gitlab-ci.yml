@@ -18,12 +18,11 @@ variables:
   AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
   GIT_SUBMODULE_STRATEGY: recursive
-  POST_MESSAGE: " ${UPSTREAM_TRIGGER_INFO}$\n
+  POST_MESSAGE: " ${UPSTREAM_TRIGGER_INFO}$\n$\n
       Pipeline Trigger: ${CI_PIPELINE_SOURCE}$\n
       Branch: ${CI_COMMIT_REF_NAME}$\n
       Commit: ${CI_COMMIT_SHA}$\n
       Author:  ${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>$\n
-      ${CI_COMMIT_TITLE}$\n
       ${CI_COMMIT_MESSAGE}"
 
 build:linux:
