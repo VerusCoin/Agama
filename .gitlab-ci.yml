@@ -33,13 +33,13 @@ build:linux:
       rm AUTH_KEY.json
   - (echo "fetching latest build from  EasyDEX-GUI:$CI_COMMIT_REF_NAME" &&
       gsutil cp $STAGING/EasyDEX-GUI/$CI_COMMIT_REF_NAME/$EASYDEX_GUI_BUILD .) ||
-      (No EasyDEX-GUI builds available from the $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_VERUSCOIN_BRANCH &&
+      (echo "No EasyDEX-GUI builds available from the ${CI_COMMIT_REF_NAME} branch, fetching from ${DEFAULT_VERUSCOIN_BRANCH}" &&
       gsutil cp $STAGING/EasyDEX-GUI/$DEFAULT_EASYDEXGUI_BRANCH/$EASYDEX_GUI_BUILD .)
   - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react &&
       rm $EASYDEX_GUI_BUILD
   - (echo "fetching builds from VerusCoin:$CLI_BRANCH" &&
       gsutil cp $STAGING/VerusCoin/$CLI_BRANCH/Linux/$VERUS_CLI_LINUX .) ||
-      (No VerusCoin builds available from the $CI_COMMIT_REF_NAME branch, fetching from $DEFAULT_VERUSCOIN_BRANCH &&
+      (echo "No VerusCoin builds available from the ${CI_COMMIT_REF_NAME} branch, fetching from ${DEFAULT_VERUSCOIN_BRANCH}" &&
       gsutil cp $STAGING/VerusCoin/$DEFAULT_VERUSCOIN_BRANCH/Linux/$VERUS_CLI_LINUX .)
   - mkdir -p assets/bin/
   - tar -xzf $VERUS_CLI_LINUX --directory assets/bin/
