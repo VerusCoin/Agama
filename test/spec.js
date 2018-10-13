@@ -31,7 +31,6 @@ describe('Application launch', function () {
       .getWindowCount().then(function (count) {
         assert.equal(count, 1);
         done();
-        return true;
       })
   })
 
@@ -41,11 +40,10 @@ describe('Application launch', function () {
     // Click on it and hit <Tab> to select the 1st - VerusCoin
     this.app.client.element('#react-select-3--value').click().keys('Tab').then(function () {
        done();
-       return true;
     })
   })
 
-/*
+
   it('delays for a bit', function() {
     return new Promise(function(resolve) {
       setTimeout(resolve, 500, true);
@@ -56,10 +54,9 @@ describe('Application launch', function () {
     this.app.client.getHTML('body').then(function (html) {
       assert(html.includes('VRSC'), 'Did not find VRSC coin')
       done();
-      return true;
     })
   })
-*/
+
 
 })
 
