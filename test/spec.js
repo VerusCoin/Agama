@@ -1,3 +1,4 @@
+//
 const Application = require('spectron').Application
 const assert = require('assert')
 const electronPath = require('electron') // Require Electron from the binaries included in node_modules.
@@ -16,21 +17,21 @@ describe('Application launch', function () {
       startTimeout: timeout,
       waitTimeout: timeout
     })
-    return this.app.start()
+    return this.app.start();
   })
 
   after(function () {
     if (this.app && this.app.isRunning()) {
-      return this.app.stop()
+      return this.app.stop();
     }
   })
 
   it('opens a window', function (done) {
     this.app.client.waitUntilWindowLoaded()
       .getWindowCount().then(function (count) {
-        assert.equal(count, 1)
-        done()
-        return true
+        assert.equal(count, 1);
+        done();
+        return true;
       })
   })
 
@@ -39,11 +40,12 @@ describe('Application launch', function () {
     this.app.client.element('#react-select-3--value').waitForVisible(3000)
     // Click on it and hit <Tab> to select the 1st - VerusCoin
     this.app.client.element('#react-select-3--value').click().keys('Tab').then(function () {
-      done()
-      return true
+       done();
+       return true;
     })
   })
 
+/*
   it('delays for a bit', function() {
     return new Promise(function(resolve) {
       setTimeout(resolve, 500, true);
@@ -53,9 +55,11 @@ describe('Application launch', function () {
   it('has VRSC in the HTML body', function(done) {
     this.app.client.getHTML('body').then(function (html) {
       assert(html.includes('VRSC'), 'Did not find VRSC coin')
-      done()
-      return true
+      done();
+      return true;
     })
   })
+*/
+
 })
 
