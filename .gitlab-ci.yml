@@ -137,7 +137,7 @@ build:mac:
   artifacts:
     paths: [$AGAMA_MACOS.dmg]
     expire_in: 1 week
-
+  allow_failure: true
 
 deploy:
   stage: deploy
@@ -154,6 +154,7 @@ deploy:
   - mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows
   - mv $AGAMA_MACOS.dmg $CI_COMMIT_REF_NAME/MacOS
   - echo $AUTH_KEY > AUTH_KEY.json
+
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
 
