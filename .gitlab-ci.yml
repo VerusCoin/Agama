@@ -6,16 +6,21 @@ variables:
   DOCKER_DRIVER: overlay2
   DEFAULT_CLI_BRANCH: dev
   DEFAULT_EASYDEXGUI_BRANCH: dev
-  AGAMA_VERSION: 0.3.13c
+  AGAMA_VERSION: 0.4.0c
   EASYDEX_GUI_BUILD: build.tar.gz
   ELECTRON_BUILD_LINUX: Agama-linux-x64
   ELECTRON_BUILD_WINDOWS: Agama-win32-x64
   ELECTRON_BUILD_MACOS: Agama-darwin-x64
-  AGAMA_LINUX: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}-beta.tar.gz
-  AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}-beta.zip
-  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}-beta
+  AGAMA_LINUX: ${ELECTRON_BUILD_LINUX}-v${AGAMA_VERSION}.tar.gz
+  AGAMA_WINDOWS: ${ELECTRON_BUILD_WINDOWS}-v${AGAMA_VERSION}.zip
+  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}
   GIT_SUBMODULE_STRATEGY: recursive
-  POST_COMMENT: "$\n Agama Branch and Commit: ${CI_COMMIT_REF_NAME} $\n${CI_COMMIT_SHA} $\nMD5: "
+  POST_COMMENT: "Source: ${CI_PROJECT_NAME}/${CI_COMMIT_REF_NAME}\n
+  Pipeline Trigger: ${CI_PIPELINE_SOURCE}\n
+  Commit: ${CI_COMMIT_SHA}$\n
+  ${CI_COMMIT_MESSAGE}"
+
+
 build:linux:
   image: asherd/agama-builder
   stage: build
@@ -45,6 +50,11 @@ build:linux:
   - npm run package-linux
   - cd build
   - tar -czf $AGAMA_LINUX $ELECTRON_BUILD_LINUX
+  - curl -F file=@"$AGAMA_LINUX"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
   - mv $AGAMA_LINUX ..
   artifacts:
     paths: [$AGAMA_LINUX]
@@ -80,6 +90,11 @@ build:windows:
   - npm run package-win
   - cd build
   - zip -r $AGAMA_WINDOWS $ELECTRON_BUILD_WINDOWS
+  - curl -F file=@"$AGAMA_WINDOWS"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
   - mv $AGAMA_WINDOWS ..
   artifacts:
     paths: [$AGAMA_WINDOWS]
@@ -108,6 +123,11 @@ build:mac:
   - npm install electron-packager -g
   - npm run package-mac
   - npm run create-installer-mac
+  - curl -F file=@"$AGAMA_MACOS.dmg"
+      -F channels="$AGAMA_POST_CHANNEL"
+      -F initial_comment="${POST_COMMENT}"
+      -H "${SLACK_BOT_AUTH}"
+      "https://slack.com/api/files.upload"
   artifacts:
     paths: [$AGAMA_MACOS.dmg]
     expire_in: 1 week
@@ -120,26 +140,7 @@ deploy:
   - build:linux
   - build:windows
   - build:mac
-  before_script:
-  - export AGAMA_LINUX_MD5=$(md5sum $AGAMA_LINUX | cut -d " " -f 1)
-  - export AGAMA_WINDOWS_MD5=$(md5sum $AGAMA_WINDOWS | cut -d " " -f 1)
-  - export AGAMA_MACOS_MD5=$(md5sum $AGAMA_MACOS.dmg | cut -d " " -f 1)
   script:
-  - curl -F file=@"$AGAMA_LINUX"
-      -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_LINUX_MD5"
-      -H "${SLACK_BOT_AUTH}"
-      "https://slack.com/api/files.upload"
-  - curl -F file=@"$AGAMA_WINDOWS"
-      -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_WINDOWS_MD5"
-      -H "${SLACK_BOT_AUTH}"
-      "https://slack.com/api/files.upload"
-  - curl -F file=@"$AGAMA_MACOS.dmg"
-      -F channels="$AGAMA_POST_CHANNEL"
-      -F initial_comment="${POST_COMMENT} $AGAMA_MACOS_MD5"
-      -H "${SLACK_BOT_AUTH}"
-      "https://slack.com/api/files.upload"
   - mkdir -p $CI_COMMIT_REF_NAME/Windows
   - mkdir -p $CI_COMMIT_REF_NAME/Linux
   - mkdir -p $CI_COMMIT_REF_NAME/MacOS

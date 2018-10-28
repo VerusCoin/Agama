@@ -151,6 +151,9 @@ module.exports = (shepherd) => {
     if (network === 'VRSC'){
       return true;
     }
+    if (network === 'VERUSTEST'){
+      return true;
+    }
     else {
     try {
       const _b58check = shepherd.isZcash(network.toLowerCase()) ? bitcoinZcash.address.fromBase58Check(address) : bitcoin.address.fromBase58Check(address);

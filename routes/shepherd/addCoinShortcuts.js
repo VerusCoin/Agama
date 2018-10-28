@@ -102,7 +102,7 @@ module.exports = (shepherd) => {
 
       httpRequest();
     } else if (selection === 'VRSC') {
-      herdData = {
+        herdData = {
           'ac_name': 'VRSC',
           'ac_options': [
               '-ac_algo=verushash',
@@ -117,13 +117,22 @@ module.exports = (shepherd) => {
               '-ac_timeunlockfrom=129600',
               '-ac_timeunlockto=1180800',
               '-ac_veruspos=50',
-              '-gen',
-              '-genproclimit=0'
           ]
-      };
+        };
+
+        //Checking for VRSC specific config commands 
+        if(shepherd.appConfig.autoStakeVRSC) {
+          herdData['ac_options'].push('-mint');
+          console.log('VRSC Staking set to default');
+        }
+        if(shepherd.appConfig.cheatCatcher.length === 78) {
+          herdData['ac_options'].push('-cheatcatcher=' + shepherd.appConfig.cheatCatcher);
+          console.log('Cheatcatching enabled at address ' + shepherd.appConfig.cheatCatcher);
+        }
+      
 
       httpRequest();
-  }  else {
+    }  else {
       const herdData = [{
         'ac_name': 'komodod',
         'ac_options': [
