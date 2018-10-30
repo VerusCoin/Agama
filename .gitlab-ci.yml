@@ -8,9 +8,7 @@ variables:
   DOCKER_DRIVER: overlay2
   DEFAULT_VERUSCOIN_BRANCH: dev
   DEFAULT_EASYDEXGUI_BRANCH: dev
-
   AGAMA_VERSION: 0.4.0c
-
   EASYDEX_GUI_BUILD: build.tar.gz
   ELECTRON_BUILD_LINUX: Agama-linux-x64
   ELECTRON_BUILD_WINDOWS: Agama-win32-x64
@@ -25,6 +23,7 @@ variables:
       Commit: ${CI_COMMIT_SHA}$\n
       Author:  ${GITLAB_USER_NAME} <${GITLAB_USER_EMAIL}>$\n
       ${CI_COMMIT_MESSAGE}"
+
 
 build:linux:
   image: asherd/agama-builder
@@ -139,7 +138,7 @@ build:mac:
   artifacts:
     paths: [$AGAMA_MACOS.dmg]
     expire_in: 1 week
-  allow_failure: true
+    
 
 deploy:
   stage: deploy
@@ -156,7 +155,6 @@ deploy:
   - mv $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows
   - mv $AGAMA_MACOS.dmg $CI_COMMIT_REF_NAME/MacOS
   - echo $AUTH_KEY > AUTH_KEY.json
-
   - gcloud auth activate-service-account --key-file AUTH_KEY.json
   - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
 
