@@ -1,7 +1,8 @@
 const fs = require('fs-extra');
 const _fs = require('graceful-fs');
 const wif = require('wif');
-const bitcoinJS = require('bitcoinjs-lib');
+//const bitcoinJS = require('bitcoinjs-lib');
+const bitcoinJS = require('bitgo-utxo-lib');
 
 module.exports = (shepherd) => {
   /*

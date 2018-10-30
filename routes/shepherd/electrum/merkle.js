@@ -43,7 +43,9 @@ module.exports = (shepherd) => {
     }
 
     const _rnd = getRandomIntInclusive(0, serverList.length - 1);
+    console.log('SERVER LIST LENGTH: ' + serverList.length + ', CHOSEN SERVER INDEX: ' + _rnd)
     const randomServer = serverList[_rnd];
+    console.log(randomServer)
     const _randomServer = randomServer.split(':');
     const _mainServer = mainServer.split(':');
 

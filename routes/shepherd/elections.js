@@ -1,5 +1,6 @@
 const bs58check = require('bs58check');
-const bitcoin = require('bitcoinjs-lib');
+//const bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitgo-utxo-lib');
 const Promise = require('bluebird');
 
 module.exports = (shepherd) => {

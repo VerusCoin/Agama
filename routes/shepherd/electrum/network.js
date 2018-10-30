@@ -1,4 +1,5 @@
 const { isKomodoCoin } = require('agama-wallet-lib/src/coin-helpers');
+const bitcoin = require('bitgo-utxo-lib');
 
 const txDecoder = {
   default: require('../../electrumjs/electrumjs.txdecoder.js'),
@@ -35,6 +36,16 @@ module.exports = (shepherd) => {
 
   shepherd.getNetworkData = (network) => {
     let coin = shepherd.findNetworkObj(network) || shepherd.findNetworkObj(network.toUpperCase()) || shepherd.findNetworkObj(network.toLowerCase());
+    console.log('searching for ' + coin + ' network data...');
+    try {
+      console.log('Nework data retreived for ' + bitcoin.networks[coin].messagePrefix)
+      return bitcoin.networks[coin]
+    }
+    catch(e) {
+      console.log("Error finding " + coin + ' network data! Defaulting to default network data...');
+      return bitcoin.networks['default']
+    }
+/*
     const coinUC = coin ? coin.toUpperCase() : null;
 
     if (!coin &&
@@ -48,6 +59,7 @@ module.exports = (shepherd) => {
     } else {
       return shepherd.electrumJSNetworks[network];
     }
+*/
   }
 
   shepherd.findNetworkObj = (coin) => {
@@ -99,7 +111,7 @@ module.exports = (shepherd) => {
     const _coin = req.query.coin;
 
     if (shepherd.checkToken(req.query.token)) {
-      shepherd.electrumCoins[_coin].server = {
+      shepherd.electrumCoins[_coin.toLowerCase()].server = {
         ip: req.query.address,
         port: req.query.port,
         proto: req.query.proto,

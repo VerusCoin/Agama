@@ -1,4 +1,6 @@
-const bitcoinJS = require('bitcoinjs-lib');
+//const bitcoinJS = require('bitcoinjs-lib');
+const bitcoinJS = require('bitgo-utxo-lib');
+const bitcoin = require('bitgo-utxo-lib');
 const bitcoinJSForks = require('bitcoinforksjs-lib');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
 const bitcoinPos = require('bitcoinjs-lib-pos');
@@ -56,17 +58,27 @@ module.exports = (shepherd) => {
   }
 
   // single sig
-  shepherd.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn) => {
-    let key = shepherd.isZcash(network) ? bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network)) : bitcoinJS.ECPair.fromWIF(wif, shepherd.getNetworkData(network));
+  shepherd.buildSignedTx = (sendTo, changeAddress, wif, network, utxo, changeValue, spendValue, opreturn, blockheight) => {
+    console.log('Initiating transaction build procedure')
+
+    let key = bitcoinJS.ECPair.fromWIF(wif, bitcoin.networks[network]);
     let tx;
+    
+
+    console.log('Keypair intialized and transaction defined')
 
     if (shepherd.isZcash(network)) {
+      console.log('network isZcash', true);
       tx = new bitcoinZcash.TransactionBuilder(shepherd.getNetworkData(network));
     } else if (shepherd.isPos(network)) {
+      console.log('network isPos', true);
       tx = new bitcoinPos.TransactionBuilder(shepherd.getNetworkData(network));
     } else {
+      console.log('network bitcoinJS', true);
       tx = new bitcoinJS.TransactionBuilder(shepherd.getNetworkData(network));
     }
+
+    console.log('Unsigned transaction structure constructed successfully');
 
     shepherd.log('buildSignedTx', true);
     // console.log(`buildSignedTx priv key ${wif}`);
@@ -77,29 +89,40 @@ module.exports = (shepherd) => {
       tx.addInput(utxo[i].txid, utxo[i].vout);
     }
 
+    console.log(utxo);
+
+    console.log('UTXOs added to transaction')
+
     if (shepherd.isPos(network)) {
+      console.log('Network is Pos, adding special output')
       tx.addOutput(
         sendTo,
         Number(spendValue),
         shepherd.getNetworkData(network)
       );
     } else {
+      console.log('Adding output to transaction')
       tx.addOutput(sendTo, Number(spendValue));
     }
 
     if (changeValue > 0) {
+      console.log('Change value larger than 0, adding change value output')
       if (shepherd.isPos(network)) {
+        console.log('Special case for Pos on adding change value')
         tx.addOutput(
           changeAddress,
           Number(changeValue),
           shepherd.getNetworkData(network)
         );
       } else {
+        console.log('Adding change value for standard network')
         tx.addOutput(changeAddress, Number(changeValue));
       }
     }
 
     if (opreturn) {
+      console.log('Opreturn detected, adding to outputs:')
+      console.log(opreturn)
       const data = Buffer.from(opreturn, 'utf8');
       const dataScript = shepherd.bitcoinJS.script.nullData.output.encode(data);
       tx.addOutput(dataScript, 1000);
@@ -108,17 +131,40 @@ module.exports = (shepherd) => {
 
     if (network === 'komodo' ||
         network.toUpperCase() === 'KMD') {
+      console.log('Network detected as ' + network)
       const _locktime = Math.floor(Date.now() / 1000) - 777;
       tx.setLockTime(_locktime);
       shepherd.log(`kmd tx locktime set to ${_locktime}`, true);
     }
 
+    console.log('Current block height: ' + blockheight);
+
+    let versionNum;
+    if ((blockheight === 419200 && network === 'zec') || 
+        (blockheight === 227520 && network === 'vrsc')){
+      versionNum = 4;
+    }
+    else {
+      if (network === 'zec') {
+        versionNum = 3;
+      }
+      else {
+        versionNum = 1;
+      }
+    }
+
+    tx.setVersion(versionNum);
+    
+    console.log('Set version to ' + versionNum)
+
+    /*
     shepherd.log('buildSignedTx unsigned tx data vin', true);
     shepherd.log(tx.tx.ins, true);
     shepherd.log('buildSignedTx unsigned tx data vout', true);
     shepherd.log(tx.tx.outs, true);
     shepherd.log('buildSignedTx unsigned tx data', true);
     shepherd.log(tx, true);
+    */
 
     for (let i = 0; i < utxo.length; i++) {
       if (shepherd.isPos(network)) {
@@ -128,14 +174,21 @@ module.exports = (shepherd) => {
           key
         );
       } else {
-        tx.sign(i, key);
+        console.log('________________________________________________________');
+        console.log('KEYPAIR NETWORK: ')
+        console.log(key.network)
+        console.log('________________________________________________________');
+        tx.sign(i, key, '', null, utxo[i].value);
+        console.log('Standard transaction signed')
       }
     }
 
     const rawtx = tx.build().toHex();
 
+    /*
     shepherd.log('buildSignedTx signed tx hex', true);
     shepherd.log(rawtx, true);
+*/
 
     return rawtx;
   }
@@ -307,6 +360,7 @@ module.exports = (shepherd) => {
                 value: Number(utxoList[i].amountSats),
                 interestSats: Number(utxoList[i].interestSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                blockheight: utxoList[i].blockheight
               });
             } else {
               utxoListFormatted.push({
@@ -314,6 +368,7 @@ module.exports = (shepherd) => {
                 vout: utxoList[i].vout,
                 value: Number(utxoList[i].amountSats),
                 verified: utxoList[i].verified ? utxoList[i].verified : false,
+                blockheight: utxoList[i].blockheight
               });
             }
           }
@@ -348,6 +403,7 @@ module.exports = (shepherd) => {
           );
           let inputs = firstRun.inputs;
           let outputs = firstRun.outputs;
+          let currentheight = utxoListFormatted[0].blockheight;
 
           if (btcFee) {
             shepherd.log(`btc fee per byte ${btcFee}`, true);
@@ -554,7 +610,8 @@ module.exports = (shepherd) => {
                         inputs,
                         _change,
                         value,
-                        opreturn
+                        opreturn,
+                        currentheight
                       );
                     }
                   }

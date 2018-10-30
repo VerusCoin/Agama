@@ -23,7 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-var bitcoin = require('bitcoinjs-lib');
+//var bitcoin = require('bitcoinjs-lib');
+var bitcoin = require('bitgo-utxo-lib');
 // zcash fallback
 const Buffer = require('safe-buffer').Buffer;
 const {
@@ -74,6 +75,7 @@ var decodeInput = function(tx) {
 
 var decodeOutput = function(tx, network) {
   var format = function(out, n, network) {
+    console.log('OUT VALUE IS ' + out.value)
     var vout = {
       satoshi: out.value,
       value: (1e-8 * out.value).toFixed(8),
@@ -113,16 +115,42 @@ var decodeOutput = function(tx, network) {
 
 var TxDecoder = module.exports = function(rawtx, network) {
   try {
-    const _tx = bitcoin.Transaction.fromHex(rawtx);
+    /*
+    console.log('Decoding transaction on network: ')
+    console.log(network)
+    */
+    const _tx = bitcoin.Transaction.fromHex(rawtx, network);
 
+    /*
+    console.log('------------------------------------------------------------------------------------')
+    console.log(_tx)
+    console.log('------------------------------------------------------------------------------------')
+    */
+
+    if (network.isZcash && (_tx.joinsplits || (_tx.vShieldedSpend || _tx.vShieldedOutput))) {
+      console.log('ZTx Detected, decoding');
+
+      const buffer = Buffer.from(rawtx, 'hex');
+
+      const readHash = buffer => {
+        const [res, bufferLeft] = readSlice(32)(_sha256(_sha256(buffer)))
+        const hash = Buffer.from(res, 'hex').reverse().toString('hex')
+        return hash
+      };
+
+      _tx.getId = () => {
+        return readHash(buffer);
+      };
+    }
     return {
       tx: _tx,
       network: network,
       format: decodeFormat(_tx),
-      inputs: decodeInput(_tx),
+      inputs: !_tx.ins.length ? [{ txid: '0000000000000000000000000000000000000000000000000000000000000000' }] : decodeInput(_tx),
       outputs: decodeOutput(_tx, network),
     };
   } catch (e) {
+    console.log(e);
     if (network.isZcash) {
       console.log('z tx decode fallback');
 
@@ -140,12 +168,12 @@ var TxDecoder = module.exports = function(rawtx, network) {
       const readHash = buffer => {
         const [res, bufferLeft] = readSlice(32)(_sha256(_sha256(buffer)))
         const hash = Buffer.from(res, 'hex').reverse().toString('hex')
-        return [hash, bufferLeft]
+        return hash
       };
 
       let decodedtx = decodeTx(buffer);
       decodedtx[0].getId = () => {
-        return readHash(buffer)[0];
+        return readHash(buffer);
       };
 
       return {

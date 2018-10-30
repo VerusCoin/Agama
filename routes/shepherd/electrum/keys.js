@@ -4,13 +4,15 @@ const bip39 = require('bip39');
 const crypto = require('crypto');
 const bigi = require('bigi');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
-const bitcoin = require('bitcoinjs-lib');
+//const bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitgo-utxo-lib');
 const bs58check = require('bs58check');
 
 module.exports = (shepherd) => {
   shepherd.wifToWif = (wif, network) => {
     network = network.toLowerCase();
-    const key = shepherd.isZcash(network) ? new bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true) : new bitcoin.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true);
+    //const key = shepherd.isZcash(network) ? new bitcoinZcash.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true) : new bitcoin.ECPair.fromWIF(wif, shepherd.getNetworkData(network), true);
+    const key = new bitcoin.ECPair.fromWIF(wif, bitcoin.networks[network], true);
 
     return {
       pub: key.getAddress(),

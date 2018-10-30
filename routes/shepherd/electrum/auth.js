@@ -1,6 +1,7 @@
 const bs58check = require('bs58check');
 const bitcoinZcash = require('bitcoinjs-lib-zcash');
-const bitcoin = require('bitcoinjs-lib');
+//const bitcoin = require('bitcoinjs-lib');
+const bitcoin = require('bitgo-utxo-lib');
 
 module.exports = (shepherd) => {
   shepherd.post('/electrum/login', (req, res, next) => {

@@ -13,6 +13,7 @@ const appConfig = {
     dataDir: '',
     autoStartVRSC: false,
     autoStakeVRSC: false,
+    //darkMode: false,
     cheatCatcher: '',
     dex: {
       walletUnlockTimeout: 3600,
@@ -99,6 +100,14 @@ const appConfig = {
       displayName: 'Automatically start staking VerusCoin when it is launched in native mode',
       type: 'boolean',
     },
+    /*
+    darkMode: {
+      display: true,
+      initDisplay: true,
+      displayName: 'Change UI to dark mode',
+      type: 'boolean',
+    },
+    */
     cheatCatcher: {
       display: true,
       info: 'As part of the VerusCoin Something at Stake solution, you can enter a Verus sapling address in this field, so when you catch them, you get their staking reward.',

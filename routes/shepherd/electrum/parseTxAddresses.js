@@ -74,12 +74,12 @@ module.exports = (shepherd) => {
 
     _addresses.inputs = [ ...new Set(_addresses.inputs) ];
     _addresses.outputs = [ ...new Set(_addresses.outputs) ];
-
+/*
     shepherd.log('addresses in =>', true);
     shepherd.log(_addresses.inputs, true);
     shepherd.log('addresses out =>', true);
     shepherd.log(_addresses.outputs, true);
-
+*/
     let isSelfSend = {
       inputs: false,
       outputs: false,
