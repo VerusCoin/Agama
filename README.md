@@ -8,7 +8,9 @@ Check [the VerusCoin github Wiki](https://github.com/VerusCoin/VerusCoin/wiki) f
 Also [check the Discord commnity](https://discordapp.com/channels/444621794964537354/449633547343495172)
 
 This version adds portable VerusHash support for Linux. It was tested against Ubuntu LTS 16 & 18.
-Version 0.3.13 fixes an error in limiting transactions that can cause the GUI to complain that there are not enough funds to send a transaction when funds are sufficient and 
+Version 0.3.13c Integrates the Electrum Server and Verus lite support
+Version 0.3.13b fixed balance verification on send.
+Version 0.3.13a fixes an error in limiting transactions that can cause the GUI to complain that there are not enough funds to send a transaction when funds are sufficient and 
 the list display showing incorrect blocks to maturity in some views.
 Version 0.3.13 Introduced the ability to filter through transactions, added the option
 to automatically load VRSC on startup, added a blocktype display in transaction info, 
