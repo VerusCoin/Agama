@@ -138,7 +138,7 @@ build:mac:
   artifacts:
     paths: [$AGAMA_MACOS.dmg]
     expire_in: 1 week
-
+    
 
 deploy:
   stage: deploy

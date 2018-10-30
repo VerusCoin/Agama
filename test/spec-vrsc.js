@@ -4,7 +4,7 @@ const electronPath = require('electron') // Require Electron from the binaries i
 const path = require('path')
 const chai = require('chai')
 const timeout = 7500;
-describe('Application launch testing native BTCH coin', function () {
+describe('Application launch testing native VRSC coin', function () {
   this.timeout(timeout)
   before(function () {
     this.gotDomReadyCount = 0
@@ -33,11 +33,11 @@ describe('Application launch testing native BTCH coin', function () {
       })
   })
 
-  it('has a native coin list that takes btch', function (done) {
+  it('has a native coin list that takes vrsc', function (done) {
     // Wait for the left button for native mode coins is visible
     this.app.client.element('#react-select-3--value').waitForVisible(3000)
-    // Click on it and enter btch<enter>
-    this.app.client.element('#react-select-3--value').click().keys('btch\r\n').then(function () {
+    // Click on it and enter vrsc<enter>
+    this.app.client.element('#react-select-3--value').click().keys('vrsc\r\n').then(function () {
       done()
     })
   })
@@ -48,9 +48,9 @@ describe('Application launch testing native BTCH coin', function () {
     });
   })
 
-  it('has BTCH in the HTML body', function(done) {
+  it('has VRSC in the HTML body', function(done) {
     this.app.client.getHTML('body').then(function (html) {
-      assert(html.includes('BTCH'), 'Did not find BTCH coin')
+      assert(html.includes('VRSC'), 'Did not find VRSC coin')
       done()
     })
   })
