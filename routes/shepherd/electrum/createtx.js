@@ -140,8 +140,8 @@ module.exports = (shepherd) => {
     console.log('Current block height: ' + blockheight);
 
     let versionNum;
-    if ((blockheight === 419200 && network === 'zec') || 
-        (blockheight === 227520 && network === 'vrsc')){
+    if ((blockheight >= 419200 && network === 'zec') || 
+        (blockheight >= 227520 && network === 'vrsc')){
       versionNum = 4;
     }
     else {
