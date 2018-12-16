@@ -58,12 +58,12 @@ module.exports = (shepherd) => {
         }
         break;
       case 'coind':
-        DaemonConfPath = _platform === 'win32' ? shepherd.path.normalize(`${shepherd.coindRootDir}/${coind.toLowerCase()}`) : `${shepherd.coindRootDir}/${coind.toLowerCase()}`;
+        DaemonConfPath = _platform === 'win32' ? path.normalize(`${shepherd.coindRootDir}/${coind.toLowerCase()}`) : `${shepherd.coindRootDir}/${coind.toLowerCase()}`;
         break;
       default:
         DaemonConfPath = `${shepherd.komodoDir}/${flock}`;
         if (_platform === 'win32') {
-          DaemonConfPath = shepherd.path.normalize(DaemonConfPath);
+          DaemonConfPath = path.normalize(DaemonConfPath);
         }
     }
 
@@ -76,9 +76,17 @@ module.exports = (shepherd) => {
   // TODO: json.stringify wrapper
 
   const herder = (flock, data, coind) => {
+    let acDaemon = false;
+
     if (data === undefined) {
       data = 'none';
       shepherd.log('it is undefined');
+    } else {
+      if (data.ac_daemon !== undefined) {
+        flock = data.ac_daemon;
+        acDaemon = true;
+        shepherd.acDaemonPath(flock);
+      }
     }
 
     shepherd.log(`herder flock: ${flock} coind: ${coind}`);
@@ -86,7 +94,7 @@ module.exports = (shepherd) => {
 
     // TODO: notify gui that reindex/rescan param is used to reflect on the screen
     //       asset chain debug.log unlink
-    if (flock === 'komodod') {
+    if (flock === 'komodod' || acDaemon) {
       let kmdDebugLogLocation = (data.ac_name !== 'komodod' ? `${shepherd.komodoDir}/${data.ac_name}` : shepherd.komodoDir) + '/debug.log';
 
       // get custom coind port
@@ -120,9 +128,9 @@ module.exports = (shepherd) => {
         shepherd.log(`${data.ac_name} port ${shepherd.assetChainPorts[data.ac_name]}`);
       }
 
-      shepherd.log('komodod flock selected...');
+      shepherd.log(`${flock} flock selected...`);
       shepherd.log(`selected data: ${JSON.stringify(data, null, '\t')}`);
-      shepherd.writeLog('komodod flock selected...');
+      shepherd.writeLog(`${flock} flock selected...`);
       shepherd.writeLog(`selected data: ${data}`);
 
       // datadir case, check if komodo/chain folder exists
@@ -133,17 +141,17 @@ module.exports = (shepherd) => {
         try {
           _fs.accessSync(_dir, fs.R_OK | fs.W_OK);
 
-          shepherd.log(`komodod datadir ${_dir} exists`);
+          shepherd.log(`${flock} datadir ${_dir} exists`);
         } catch (e) {
-          shepherd.log(`komodod datadir ${_dir} access err: ${e}`);
-          shepherd.log(`attempting to create komodod datadir ${_dir}`);
+          shepherd.log(`${flock} datadir ${_dir} access err: ${e}`);
+          shepherd.log(`attempting to create ${flock} datadir ${_dir}`);
 
           fs.mkdirSync(_dir);
 
           if (fs.existsSync(_dir)) {
-            shepherd.log(`created komodod datadir folder at ${_dir}`);
+            shepherd.log(`created ${flock} datadir folder at ${_dir}`);
           } else {
-            shepherd.log(`unable to create komodod datadir folder at ${_dir}`);
+            shepherd.log(`unable to create ${flock} datadir folder at ${_dir}`);
           }
         }
       }
@@ -166,8 +174,8 @@ module.exports = (shepherd) => {
             }
           }
         } catch (e) {
-          shepherd.log(`komodod debug.log access err: ${e}`);
-          shepherd.writeLog(`komodod debug.log access err: ${e}`);
+          shepherd.log(`${flock} debug.log access err: ${e}`);
+          shepherd.writeLog(`${flock} debug.log access err: ${e}`);
         }
       }
 
@@ -187,12 +195,14 @@ module.exports = (shepherd) => {
               change: '-pubkey=',
               datadir: '-datadir=',
               rescan: '-rescan',
+              gen: '-gen',
             };
             let _customParam = '';
 
             if (data.ac_custom_param === 'silent' ||
                 data.ac_custom_param === 'reindex' ||
-                data.ac_custom_param === 'rescan') {
+                data.ac_custom_param === 'rescan' ||
+                data.ac_custom_param === 'gen') {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}`;
             } else if (data.ac_custom_param === 'change' && data.ac_custom_param_value) {
               _customParam = ` ${_customParamDict[data.ac_custom_param]}${data.ac_custom_param_value}`;
@@ -202,8 +212,15 @@ module.exports = (shepherd) => {
               _customParam = _customParam + ' -datadir=' + shepherd.appConfig.dataDir + (data.ac_name !== 'komodod' ? '/' + data.ac_name : '');
             }
 
-            shepherd.log(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
-            shepherd.writeLog(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
+            if (acDaemon) {
+              shepherd.log(`exec ${shepherd[flock + 'Bin']} ${data.ac_options.join(' ')}${_customParam}`);
+              shepherd.writeLog(`exec ${shepherd[flock + 'Bin']} ${data.ac_options.join(' ')}${_customParam}`);
+            }
+            else {
+              shepherd.log(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
+              shepherd.writeLog(`exec ${shepherd.komododBin} ${data.ac_options.join(' ')}${_customParam}`);
+            }
+            
 
             const isChain = data.ac_name.match(/^[A-Z]*$/);
             const coindACParam = isChain ? ` -ac_name=${data.ac_name} ` : '';
@@ -229,14 +246,34 @@ module.exports = (shepherd) => {
                 let spawnOut = fs.openSync(_daemonLogName, 'a');
                 let spawnErr = fs.openSync(_daemonLogName, 'a');
 
-                spawn(shepherd.komododBin, _arg, {
-                  stdio: ['ignore', spawnOut, spawnErr],
-                  detached: true,
-                }).unref();
+                if (acDaemon) {
+                  spawn(shepherd[flock + 'Bin'], _arg, {
+                    stdio: [
+                      'ignore',
+                      spawnOut,
+                      spawnErr
+                    ],
+                    detached: true,
+                  }).unref();
+                } 
+                else {
+                  spawn(shepherd.komododBin, _arg, {
+                    stdio: [
+                      'ignore',
+                      spawnOut,
+                      spawnErr
+                    ],
+                    detached: true,
+                  }).unref();
+                }
+                
               } else {
                 let logStream = fs.createWriteStream(_daemonLogName, { flags: 'a' });
 
-                let _daemonChildProc = execFile(`${shepherd.komododBin}`, _arg, {
+                let _daemonChildProc;
+
+                _daemonChildProc = acDaemon ? 
+                execFile(`${shepherd[flock + 'Bin']}`, _arg, {
                   maxBuffer: 1024 * 1000000, // 1000 mb
                 }, (error, stdout, stderr) => {
                   shepherd.writeLog(`stdout: ${stdout}`);
@@ -254,7 +291,29 @@ module.exports = (shepherd) => {
                       });
                     }
                   }
-                });
+                })
+                :
+                execFile(`${shepherd.komododBin}`, _arg, {
+                  maxBuffer: 1024 * 1000000, // 1000 mb
+                }, (error, stdout, stderr) => {
+                  shepherd.writeLog(`stdout: ${stdout}`);
+                  shepherd.writeLog(`stderr: ${stderr}`);
+
+                  if (error !== null) {
+                    shepherd.log(`exec error: ${error}`);
+                    shepherd.writeLog(`exec error: ${error}`);
+
+                    if (error.toString().indexOf('using -reindex') > -1) {
+                      shepherd.io.emit('service', {
+                        komodod: {
+                          error: 'run -reindex',
+                        },
+                      });
+                    }
+                  }
+                })
+                ;
+                
 
                 _daemonChildProc.stdout.on('data', (data) => {
                   // shepherd.log(`${_daemonName} stdout: \n${data}`);
@@ -355,14 +414,14 @@ module.exports = (shepherd) => {
 
             shepherd.log(`daemon param ${data.ac_custom_param}`);
 
-            shepherd.coindInstanceRegistry['CHIPS'] = true;
+            shepherd.coindInstanceRegistry.CHIPS = true;
             let _arg = `${_customParam}`;
             _arg = _arg.trim().split(' ');
 
             if (_arg &&
                 _arg.length > 1) {
               execFile(`${shepherd.chipsBin}`, _arg, {
-                maxBuffer: 1024 * 1000000 // 1000 mb
+                maxBuffer: 1024 * 1000000, // 1000 mb
               }, (error, stdout, stderr) => {
                 shepherd.writeLog(`stdout: ${stdout}`);
                 shepherd.writeLog(`stderr: ${stderr}`);
@@ -439,7 +498,7 @@ module.exports = (shepherd) => {
             fs.unlink(coindDebugLogLocation);
           }
         });
-       } catch(e) {
+       } catch (e) {
          shepherd.log(`coind ${coind} debug.log access err: ${e}`);
          shepherd.writeLog(`coind ${coind} debug.log access err: ${e}`);
        }
@@ -460,7 +519,7 @@ module.exports = (shepherd) => {
             let _arg = `${data.ac_options.join(' ')}`;
             _arg = _arg.trim().split(' ');
             execFile(`${coindBin}`, _arg, {
-              maxBuffer: 1024 * 1000000 // 1000 mb
+              maxBuffer: 1024 * 1000000, // 1000 mb
             }, (error, stdout, stderr) => {
               shepherd.writeLog(`stdout: ${stdout}`);
               shepherd.writeLog(`stderr: ${stderr}`);
@@ -475,7 +534,7 @@ module.exports = (shepherd) => {
             shepherd.writeLog(`port ${_port} (${coind}) is already in use`);
           }
         });
-      } catch(e) {
+      } catch (e) {
         shepherd.log(`failed to start ${coind} err: ${e}`);
         shepherd.writeLog(`failed to start ${coind} err: ${e}`);
       }
@@ -503,6 +562,7 @@ module.exports = (shepherd) => {
     }
 
     switch (flock) {
+      case 'verusd':
       case 'komodod':
         DaemonConfPath = `${shepherd.komodoDir}/komodo.conf`;
 
@@ -609,7 +669,7 @@ module.exports = (shepherd) => {
                 shepherd.log('rpcuser: OK');
                 shepherd.writeLog('rpcuser: OK');
               } else {
-                const randomstring = shepherd.md5((Math.random() * Math.random() * 999).toString());
+                const randomstring = md5((Math.random() * Math.random() * 999).toString());
 
                 shepherd.log('rpcuser: NOT FOUND');
                 shepherd.writeLog('rpcuser: NOT FOUND');
@@ -647,7 +707,6 @@ module.exports = (shepherd) => {
                     shepherd.writeLog(`append daemon conf err: ${err}`);
                     shepherd.log(`append daemon conf err: ${err}`);
                   }
-                  // throw err;
                   shepherd.log('rpcpassword: ADDED');
                   shepherd.writeLog('rpcpassword: ADDED');
                 });
@@ -674,7 +733,6 @@ module.exports = (shepherd) => {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
                       shepherd.log(`append daemon conf err: ${err}`);
                     }
-                    // throw err;
                     shepherd.log('rpcport: ADDED');
                     shepherd.writeLog('rpcport: ADDED');
                   });
@@ -750,7 +808,6 @@ module.exports = (shepherd) => {
                       shepherd.writeLog(`append daemon conf err: ${err}`);
                       shepherd.log(`append daemon conf err: ${err}`);
                     }
-                    // throw err;
                     shepherd.log('addnode: ADDED');
                     shepherd.writeLog('addnode: ADDED');
                   });

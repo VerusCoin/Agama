@@ -10,9 +10,9 @@ var options = {
   name: 'agama-app',
   bin: 'Agama',
   categories: ['Office', 'Internet'],
-  homepage: 'http://supernet.org',
-  maintainer: 'SuperNET <dev@supernet.org>',
-}
+  homepage: 'http://veruscoin.io',
+  maintainer: 'SuperNET <dev@supernet.org>'
+};
 
 console.log('Creating package (this may take a while)');
 

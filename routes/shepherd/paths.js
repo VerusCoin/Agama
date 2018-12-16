@@ -78,5 +78,22 @@ module.exports = (shepherd) => {
     }
   }
 
+  shepherd.acDaemonPath = (daemonName) => {
+    let binName = daemonName + "Bin";
+    switch (os.platform()) {
+      case 'darwin':
+        fixPath();
+        shepherd[binName] = path.join(__dirname, `../../assets/bin/osx/${daemonName}`);
+        break;
+      case 'linux':
+        shepherd[binName] = path.join(__dirname, `../../assets/bin/linux64/${daemonName}`);
+        break;
+      case 'win32':
+        shepherd[binName] = path.join(__dirname, `../../assets/bin/win64/${daemonName}.exe`),
+        shepherd[binName] = path.normalize(shepherd[binName]);
+        break;
+    }
+  }
+
   return shepherd;
 };

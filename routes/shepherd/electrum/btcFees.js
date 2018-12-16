@@ -35,7 +35,12 @@ module.exports = (shepherd) => {
     if (shepherd.checkToken(req.query.token)) {
       if (checkTimestamp(btcFees.lastUpdated) > BTC_FEES_MIN_ELAPSED_TIME) {
         const _randomServer = shepherd.electrumServers.btc.serverList[getRandomIntInclusive(0, shepherd.electrumServers.btc.serverList.length - 1)].split(':');
-        const ecl = new shepherd.electrumJSCore(_randomServer[1], _randomServer[0], 'tcp');
+        const ecl = shepherd.ecl(network, { port: _randomServer[1], ip: _randomServer[0], port: 'tcp' });
+        /*const ecl = new shepherd.electrumJSCore(
+          _randomServer[1],
+          _randomServer[0],
+          'tcp'
+        );*/
         let _btcFeeEstimates = [];
 
         console.log(`btc fees server ${_randomServer.join(':')}`);
@@ -56,12 +61,7 @@ module.exports = (shepherd) => {
         .then(result => {
           ecl.close();
 
-          if (result &&
-              result.length) {
-            btcFees.electrum = _btcFeeEstimates;
-          } else {
-            btcFees.electrum = 'error';
-          }
+          btcFees.electrum = result && result.length ? _btcFeeEstimates : 'error';
 
           let options = {
             url: `https://bitcoinfees.earn.com/api/v1/fees/recommended`,
@@ -92,7 +92,7 @@ module.exports = (shepherd) => {
           });
         });
       } else {
-        console.log(`btcfees, use cache`);
+        shepherd.log('btcfees, use cache', true);
 
         const successObj = {
           msg: 'success',

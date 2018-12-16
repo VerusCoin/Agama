@@ -25,7 +25,8 @@ SOFTWARE.
 var bitcoin = require('bitcoinjs-lib-pos');
 var script = require('bitcoinjs-lib-pos/src/script');
 var address = require('bitcoinjs-lib-pos/src/address');
-var bitcoinJS = require('bitcoinjs-lib');
+//var bitcoinJS = require('bitcoinjs-lib');
+var bitcoinJS = require('bitgo-utxo-lib');
 
 var decodeFormat = function(tx) {
   var result = {

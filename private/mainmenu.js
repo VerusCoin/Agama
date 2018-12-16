@@ -98,7 +98,7 @@ const template = [
       },
     ]
   }
-]
+];
 
 if (process.platform === 'darwin') {
   const name = app.getName();
@@ -179,7 +179,7 @@ if (process.platform === 'darwin') {
       role: 'front'
     }
   ]
-};
+}
 
 const menu = Menu.buildFromTemplate(template);
 Menu.setApplicationMenu(menu);

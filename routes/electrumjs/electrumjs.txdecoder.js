@@ -1,7 +1,8 @@
 /*
 MIT License
 
-Copyright (c) 2017 Yuki Akiyama, SuperNET
+Copyright (c) 2017 Yuki Akiyama
+Copyright (c) 2017 - 2018 SuperNET
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-var bitcoin = require('bitcoinjs-lib');
+//var bitcoin = require('bitcoinjs-lib');
+var bitcoin = require('bitgo-utxo-lib');
+// zcash fallback
+const Buffer = require('safe-buffer').Buffer;
+const {
+  readSlice,
+  readInt32,
+  readUInt32,
+} = require('tx-decoder/src/buffer-utils');
+const {
+  compose,
+  addProp,
+} = require('tx-decoder/src/compose');
+const {
+  readInputs,
+  readInput,
+  readOutput,
+} = require('tx-decoder/src/tx-decoder');
+const crypto = require('crypto');
+const _sha256 = (data) => {
+  return crypto.createHash('sha256').update(data).digest();
+};
 
 var decodeFormat = function(tx) {
   var result = {
@@ -39,7 +61,7 @@ var decodeInput = function(tx) {
 
   tx.ins.forEach(function(input, n) {
     var vin = {
-      txid: input.hash.reverse().toString('hex'),
+      txid: !input.hash.reverse ? input.hash : input.hash.reverse().toString('hex'),
       n: input.index,
       script: bitcoin.script.toASM(input.script),
       sequence: input.sequence,
@@ -53,6 +75,7 @@ var decodeInput = function(tx) {
 
 var decodeOutput = function(tx, network) {
   var format = function(out, n, network) {
+    console.log('OUT VALUE IS ' + out.value)
     var vout = {
       satoshi: out.value,
       value: (1e-8 * out.value).toFixed(8),
@@ -92,17 +115,77 @@ var decodeOutput = function(tx, network) {
 
 var TxDecoder = module.exports = function(rawtx, network) {
   try {
-    const _tx = bitcoin.Transaction.fromHex(rawtx);
+    /*
+    console.log('Decoding transaction on network: ')
+    console.log(network)
+    */
+    const _tx = bitcoin.Transaction.fromHex(rawtx, network);
 
+    /*
+    console.log('------------------------------------------------------------------------------------')
+    console.log(_tx)
+    console.log('------------------------------------------------------------------------------------')
+    */
+
+    if (network.isZcash && (_tx.joinsplits || (_tx.vShieldedSpend || _tx.vShieldedOutput))) {
+      console.log('ZTx Detected, decoding');
+
+      const buffer = Buffer.from(rawtx, 'hex');
+
+      const readHash = buffer => {
+        const [res, bufferLeft] = readSlice(32)(_sha256(_sha256(buffer)))
+        const hash = Buffer.from(res, 'hex').reverse().toString('hex')
+        return hash
+      };
+
+      _tx.getId = () => {
+        return readHash(buffer);
+      };
+    }
     return {
       tx: _tx,
       network: network,
       format: decodeFormat(_tx),
-      inputs: decodeInput(_tx),
+      inputs: !_tx.ins.length ? [{ txid: '0000000000000000000000000000000000000000000000000000000000000000' }] : decodeInput(_tx),
       outputs: decodeOutput(_tx, network),
     };
   } catch (e) {
-    return false;
+    console.log(e);
+    if (network.isZcash) {
+      console.log('z tx decode fallback');
+
+      const buffer = Buffer.from(rawtx, 'hex');
+
+      const decodeTx = buffer => (
+        compose([
+          addProp('version', readInt32),            // 4 bytes
+          addProp('ins', readInputs(readInput)),    // 1-9 bytes (VarInt), Input counter; Variable, Inputs
+          addProp('outs', readInputs(readOutput)),  // 1-9 bytes (VarInt), Output counter; Variable, Outputs
+          addProp('locktime', readUInt32)           // 4 bytes
+        ])({}, buffer)
+      );
+
+      const readHash = buffer => {
+        const [res, bufferLeft] = readSlice(32)(_sha256(_sha256(buffer)))
+        const hash = Buffer.from(res, 'hex').reverse().toString('hex')
+        return hash
+      };
+
+      let decodedtx = decodeTx(buffer);
+      decodedtx[0].getId = () => {
+        return readHash(buffer);
+      };
+
+      return {
+        tx: decodedtx[0],
+        network: network,
+        format: decodeFormat(decodedtx[0]),
+        inputs: !decodedtx[0].ins.length ? [{ txid: '0000000000000000000000000000000000000000000000000000000000000000' }] : decodeInput(decodedtx[0]),
+        outputs: decodeOutput(decodedtx[0], network),
+      };
+    } else {
+      return false;
+    }
   }
 }
 
