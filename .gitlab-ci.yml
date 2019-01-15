@@ -9,9 +9,9 @@ variables:
   DOCKER_DRIVER: overlay2
   DEFAULT_VERUSCOIN_BRANCH: ${CI_COMMIT_REF_NAME}
   DEFAULT_EASYDEXGUI_BRANCH: ${CI_COMMIT_REF_NAME}
-  AGAMA_VERSION: 0.5.3
-  VERUSCOIN_VERSION: 0.5.3
-  KOMODO_VERSION: 0.3.1
+  AGAMA_VERSION: 0.5.4
+  VERUSCOIN_VERSION: 0.5.4
+  KOMODO_VERSION: 0.3.3b-beta
   BINARY_SOURCE: VerusCoin
   EASYDEX_GUI_BUILD: build.tar.gz
   ELECTRON_BUILD_LINUX: Agama-linux-x64
@@ -62,7 +62,7 @@ build:linux:
   - rm Verus-CLI-Linux-v${VERUSCOIN_VERSION}.tar.gz
   - rm  komodo_linux_${KOMODO_VERSION}.tar.gz
   - rm -rf __MACOSX
-  - rm -rf komodo_win_0.3.1
+  - rm -rf komodo_win_${KOMODO_VERSION}
   - npm install electron-packager -g
   - npm install electron -g --unsafe-perm=true
   - npm install
@@ -116,7 +116,7 @@ build:windows:
   - rm Verus-CLI-Windows-v${VERUSCOIN_VERSION}.zip
   - rm komodo_win_${KOMODO_VERSION}.zip
   - rm -rf __MACOSX
-  - rm -rf komodo_win_0.3.1
+  - rm -rf komodo_win_${KOMODO_VERSION}
   - npm install electron-packager -g
   - npm install electron -g --unsafe-perm=true
   - npm install
