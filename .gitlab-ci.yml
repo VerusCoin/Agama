@@ -23,7 +23,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   POST_COMMENT: "Pipeline Trigger: ${CI_PIPELINE_SOURCE}\n
       Branch: ${CI_COMMIT_REF_NAME}\n
-      Commit: ${CI_COMMIT_SHA}\n
+      Commit: https://github.com/VerusCoin/Agama/commit/${CI_COMMIT_SHA}\n
       ${CI_COMMIT_MESSAGE}\n"
 ########################################################################################################################
 ####END####                                        PROJECT LEVEL VARIABLES                                   ####END####
