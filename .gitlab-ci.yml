@@ -115,7 +115,8 @@ build:windows:
   - wget https://github.com/KomodoPlatform/komodo/releases/download/beta-multios-0.3.3b-beta/komodo_windows_beta_0.3.3.zip
 #  - unzip komodo_win_${KOMODO_VERSION}.zip
   - unzip komodo_windows_beta_0.3.3.zip
-  - mv komodo_win_${KOMODO_VERSION}/* assets/bin/win64
+#  - mv komodo_win_${KOMODO_VERSION}/* assets/bin/win64
+  - mv komodo_windows_beta_0.3.3/* assets/bin/win64
   - strip -g  assets/bin/win64/komodod.exe && strip -g  assets/bin/win64/komodo-cli.exe && strip -g  assets/bin/win64/komodo-tx.exe
   - rm Verus-CLI-Windows-v${VERUSCOIN_VERSION}.zip
   #- rm komodo_win_${KOMODO_VERSION}.zip
