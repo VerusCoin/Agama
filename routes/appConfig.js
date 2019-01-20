@@ -15,6 +15,7 @@ const appConfig = {
     autoStakeVRSC: false,
     //darkMode: false,
     stakeGuard: '',
+    pubKey: '',
     dex: {
       walletUnlockTimeout: 3600,
     },
@@ -114,6 +115,12 @@ const appConfig = {
       display: true,
       info: 'As part of the VerusCoin Something at Stake solution, you can enter a Verus sapling address in this field, and receive awards for finding double-stakers',
       displayName: 'Your VRSC sapling address for StakeGuard',
+      type: 'string',
+    },
+    pubKey: {
+      display: true,
+      info: 'Your public key to mine to',
+      displayName: 'pubkey mining key',
       type: 'string',
     },
     dataDir: {

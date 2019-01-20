@@ -50,6 +50,10 @@ module.exports = (shepherd) => {
       },
     };
     const httpRequest = () => {
+      if(herdData && herdData.ac_options && shepherd.appConfig.pubKey && (shepherd.appConfig.pubKey.length > 0)) {
+        herdData['ac_options'].push('-pubkey=' + shepherd.appConfig.pubKey);
+        console.log('Pubkey mining enabled at address ' + shepherd.appConfig.pubKey);
+      }
       const options = {
         url: `http://127.0.0.1:${shepherd.appConfig.agamaPort}/shepherd/herd`,
         method: 'POST',
@@ -143,7 +147,7 @@ module.exports = (shepherd) => {
             '-ac_private=1',
         ]
       };
-    
+
     httpRequest();
   }  else {
       const herdData = [{
