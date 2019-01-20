@@ -120,7 +120,7 @@ const appConfig = {
     pubKey: {
       display: true,
       info: 'Your public key to mine to',
-      displayName: 'pubkey mining key',
+      displayName: 'Pubkey mining key',
       type: 'string',
     },
     dataDir: {
