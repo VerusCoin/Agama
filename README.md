@@ -6,8 +6,9 @@ This project uses [EasyDEX-GUI](https://github.com/VerusCoin/EasyDEX-GUI), a Rea
 
 Check [the VerusCoin github Wiki](https://github.com/VerusCoin/VerusCoin/wiki) for useful information about operating the wallet.
 Also [check the Discord commnity](https://discordapp.com/channels/444621794964537354/449633547343495172)
-
 This version adds portable VerusHash support for Linux. It was tested against Ubuntu LTS 16 & 18.
+Version 0.5.4 Bug fixes, mining to public key option
+Version 0.5.0 Switch to VerusHash2
 Version 0.3.13c Integrates the Electrum Server and Verus lite support
 Version 0.3.13b fixed balance verification on send.
 Version 0.3.13a fixes an error in limiting transactions that can cause the GUI to complain that there are not enough funds to send a transaction when funds are sufficient and 
