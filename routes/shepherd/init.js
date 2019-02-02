@@ -28,11 +28,17 @@ module.exports = (shepherd) => {
         fs.mkdirSync(shepherd.agamaDir);
 
         if (fs.existsSync(shepherd.agamaDir)) {
-          shepherd.log(`created agama folder at ${shepherd.agamaDir}`);
-          shepherd.writeLog(`created agama folder at ${shepherd.agamaDir}`);
+          shepherd.log(`created verus agama folder at ${shepherd.agamaDir}`);
+          shepherd.writeLog(`created verus agama folder at ${shepherd.agamaDir}`);
         }
+
+        if (fs.existsSync(shepherd.agamaDirKMD) && fs.existsSync(`${shepherd.agamaDirKMD}/config.json`)) {
+          fs.copyFileSync(`${shepherd.agamaDirKMD}/config.json`, `${shepherd.agamaDir}/config.json`);
+          shepherd.log(`located config.json in KMD folder and copied over to ${shepherd.agamaDir}`);
+          shepherd.writeLog(`located config.json in KMD folder and copied over to ${shepherd.agamaDir}`);
+        } 
       } else {
-        shepherd.log('agama folder already exists');
+        shepherd.log('verus agama folder already exists');
       }
 
       if (!fs.existsSync(`${shepherd.agamaDir}/shepherd`)) {
