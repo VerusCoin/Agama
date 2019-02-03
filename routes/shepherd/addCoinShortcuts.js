@@ -50,10 +50,6 @@ module.exports = (shepherd) => {
       },
     };
     const httpRequest = () => {
-      if(herdData && herdData.ac_options && shepherd.appConfig.pubKey && (shepherd.appConfig.pubKey.length > 0)) {
-        herdData['ac_options'].push('-pubkey=' + shepherd.appConfig.pubKey);
-        console.log('Pubkey mining enabled at address ' + shepherd.appConfig.pubKey);
-      }
       const options = {
         url: `http://127.0.0.1:${shepherd.appConfig.agamaPort}/shepherd/herd`,
         method: 'POST',
@@ -133,6 +129,11 @@ module.exports = (shepherd) => {
         if(shepherd.appConfig.stakeGuard.length === 78) {
           herdData['ac_options'].push('-cheatcatcher=' + shepherd.appConfig.stakeGuard);
           console.log('Cheatcatching enabled at address ' + shepherd.appConfig.stakeGuard);
+        }
+        if(shepherd.appConfig.pubKey && 
+          (shepherd.appConfig.pubKey.length > 0)) {
+          herdData['ac_options'].push('-pubkey=' + shepherd.appConfig.pubKey);
+          console.log('Pubkey mining enabled at address ' + shepherd.appConfig.pubKey);
         }
       
 

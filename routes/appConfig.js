@@ -1,7 +1,7 @@
 const appConfig = {
   config: { // default config
     host: '127.0.0.1',
-    agamaPort: 17777,
+    agamaPort: 17776,
     maxDescriptors: {
       darwin: 90000,
       linux: 1000000,
@@ -119,8 +119,8 @@ const appConfig = {
     },
     pubKey: {
       display: true,
-      info: 'Your public key to mine to',
-      displayName: 'Pubkey mining key',
+      info: 'Your VRSC public key to mine to, not an address',
+      displayName: 'Pubkey VRSC mining key',
       type: 'string',
     },
     dataDir: {
