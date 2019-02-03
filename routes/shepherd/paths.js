@@ -15,7 +15,7 @@ module.exports = (shepherd) => {
       case 'linux':
         shepherd.agamaDirKMD = `${process.env.HOME}/.agama`;
 
-        shepherd.agamaDir = `${process.env.HOME}/.verus_agama`;
+        shepherd.agamaDir = `${process.env.HOME}/.verus-agama`;
         break;
 
       case 'win32':
@@ -48,7 +48,7 @@ module.exports = (shepherd) => {
         break;
 
       case 'linux':
-        shepherd.agamaTestDir = `${process.env.HOME}/.verus_agama/test`,
+        shepherd.agamaTestDir = `${process.env.HOME}/.verus-agama/test`,
         shepherd.komododBin = path.join(__dirname, '../../assets/bin/linux64/komodod'),
         shepherd.komodocliBin = path.join(__dirname, '../../assets/bin/linux64/komodo-cli'),
         shepherd.komodoDir = shepherd.appConfig.dataDir.length ? shepherd.appConfig.dataDir : `${process.env.HOME}/.komodo`,
