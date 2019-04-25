@@ -156,8 +156,8 @@ build:mac:
     - export USE_HARD_LINKS=false
     - yarn run dist
     - cd dist
-    - shasum -a 256 ${AGAMA_MACOS}.dmg > ${AGAMA_MACOS}.dmg.sha256
-    - mv ${AGAMA_MACOS}.dmg ${AGAMA_MACOS}.dmg.sha256 ..
+    - shasum -a 256 ${AGAMA_MACOS} > ${AGAMA_MACOS}.sha256
+    - mv ${AGAMA_MACOS} ${AGAMA_MACOS}.sha256 ..
   after_script:
     - curl -F file=@"${AGAMA_MACOS}.dmg"
       -F channels="${AGAMA_POST_CHANNEL}"
