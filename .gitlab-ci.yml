@@ -153,6 +153,7 @@ build:mac:
     - rm komodo_osx_beta_0.3.3b.tar.gz
     - yarn install
   script:
+    - export USE_HARD_LINKS=false
     - yarn run dist
     - cd dist
     - shasum -a 256 ${AGAMA_MACOS}.dmg > ${AGAMA_MACOS}.dmg.sha256
