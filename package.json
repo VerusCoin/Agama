@@ -98,7 +98,7 @@
     ],
     "asar": false,
     "mac": {
-      "artifactName": "${productName}-MacOS-v${version}-Tech-Preview-02.${ext}",
+      "artifactName": "${productName}-MacOS-v${version}-Tech-Preview-02.1.${ext}",
       "icon": "assets/icons/agama_icons/agama_app_icon.icns",
       "target": [
         "dmg",
@@ -121,7 +121,7 @@
       ]
     },
     "linux": {
-      "artifactName": "${productName}-Linux-v${version}-Tech-Preview-02.${ext}",
+      "artifactName": "${productName}-Linux-v${version}-Tech-Preview-02.1.${ext}",
       "icon": "assets/icons/agama_icons",
       "desktop": {
         "Encoding": "UTF-8"
@@ -141,7 +141,7 @@
       ]
     },
     "win": {
-      "artifactName": "${productName}-Windows-v${version}-Tech-Preview-02.${ext}",
+      "artifactName": "${productName}-Windows-v${version}-Tech-Preview-02.1.${ext}",
       "target": [
         "nsis",
         "zip"
