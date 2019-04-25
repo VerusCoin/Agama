@@ -9,17 +9,14 @@ variables:
   DOCKER_DRIVER: overlay2
   DEFAULT_VERUSCOIN_BRANCH: ${CI_COMMIT_REF_NAME}
   DEFAULT_EASYDEXGUI_BRANCH: ${CI_COMMIT_REF_NAME}
-  AGAMA_VERSION: 0.6.0-Tech-Preview-02
+  AGAMA_VERSION: 0.6.0-Tech-Preview-02.1
   VERUSCOIN_VERSION: 0.6.0-Tech-Preview-02
   KOMODO_VERSION: 0.3.3b-beta
   BINARY_SOURCE: VerusCoin
   EASYDEX_GUI_BUILD: build.tar.gz
-  ELECTRON_BUILD_LINUX: Agama-linux-x64
-  ELECTRON_BUILD_WINDOWS: Agama-win32-x64
-  ELECTRON_BUILD_MACOS: Agama-darwin-x64
-  AGAMA_LINUX_TAR: Agama-Linux-${AGAMA_VERSION}.tar.gz
-  AGAMA_WINDOWS_ZIP: Agama-Windows-${AGAMA_VERSION}.zip
-  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}
+  AGAMA_LINUX_TAR: Agama-Linux-v${AGAMA_VERSION}.tar.gz
+  AGAMA_WINDOWS_ZIP: Agama-Windows-v${AGAMA_VERSION}.zip
+  AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}.dmg
   GIT_SUBMODULE_STRATEGY: recursive
   POST_COMMENT: "Pipeline Trigger: ${CI_PIPELINE_SOURCE}\n
       Branch: ${CI_COMMIT_REF_NAME}\n
@@ -52,7 +49,6 @@ build:linux:
     - tar -xzf $EASYDEX_GUI_BUILD --directory gui/EasyDEX-GUI/react && rm ${EASYDEX_GUI_BUILD}
     - gsutil cp $STAGING/$VERUS_CLI_LINUX .
     - mkdir -p assets/bin/linux64/verusd
-    - tar -xzvf linux64.tar.gz --strip=1 --directory assets/bin/linux64
     - tar -xzvf Verus-CLI-Linux-v${VERUSCOIN_VERSION}.tar.gz --strip=1 --directory assets/bin/linux64/verusd
     - rm Verus-CLI-Linux-v${VERUSCOIN_VERSION}.tar.gz
     - rm assets/bin/linux64/verusd/verusd
@@ -169,8 +165,8 @@ build:mac:
       "https://slack.com/api/files.upload"
   artifacts:
     paths:
-      - ${AGAMA_MACOS}.dmg
-      - ${AGAMA_MACOS}.dmg.sha256
+      - ${AGAMA_MACOS}
+      - ${AGAMA_MACOS}.sha256
       - dist
     expire_in: 1 week
 
@@ -186,10 +182,10 @@ deploy:
     - mkdir -p $CI_COMMIT_REF_NAME/Windows
     - mkdir -p $CI_COMMIT_REF_NAME/Linux
     - mkdir -p $CI_COMMIT_REF_NAME/MacOS
-    - cp $AGAMA_LINUX $CI_COMMIT_REF_NAME/Linux
-    - cp $AGAMA_WINDOWS $CI_COMMIT_REF_NAME/Windows
-    - cp $AGAMA_MACOS.dmg $CI_COMMIT_REF_NAME/MacOS
-    - echo $AUTH_KEY > AUTH_KEY.json
+    - cp ${AGAMA_LINUX_TAR} ${CI_COMMIT_REF_NAME}/Linux
+    - cp ${AGAMA_WINDOWS_ZIP} ${CI_COMMIT_REF_NAME}/Windows
+    - cp ${AGAMA_MACOS} ${CI_COMMIT_REF_NAME}/MacOS
+    - echo ${AUTH_KEY} > AUTH_KEY.json
     - gcloud auth activate-service-account --key-file AUTH_KEY.json
     - gsutil rsync -r $CI_COMMIT_REF_NAME $STAGING/Agama/$CI_COMMIT_REF_NAME/
   artifacts:
@@ -198,6 +194,6 @@ deploy:
       - ${AGAMA_LINUX_TAR}.sha256
       - ${AGAMA_WINDOWS_ZIP}
       - ${AGAMA_WINDOWS_ZIP}.sha256
-      - ${AGAMA_MACOS}.dmg
-      - ${AGAMA_MACOS}.dmg.sha256
+      - ${AGAMA_MACOS}
+      - ${AGAMA_MACOS}.sha256
     expire_in: 1 week
