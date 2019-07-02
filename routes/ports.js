@@ -55,6 +55,7 @@ const assetChainPorts = {
   RFOX: 32269,
   ZEXO: 33970,
   LABS: 40265,
+  ODA: 31210,
   VRSCTEST: 18361,
   VRSC: 27486,
 };
