@@ -308,6 +308,16 @@ const chainParams = {
 			'195.201.20.230',
 		],
 	},
+	ODA: {
+		ac_supply: 800000000,
+		ac_sapling: 1,
+		ac_public: 1,
+		ac_staked: 90,
+		ac_reward: 10000,
+		addnode: [
+			'oda.seed.komodo.top'
+		],
+	}
 };
 
 module.exports = chainParams;
