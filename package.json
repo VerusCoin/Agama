@@ -1,7 +1,7 @@
 {
   "name": "Agama",
   "productName": "Agama",
-  "version": "0.5.9-2",
+  "version": "0.5.9-dev-3",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
