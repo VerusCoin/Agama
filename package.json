@@ -1,7 +1,7 @@
 {
   "name": "Agama",
   "productName": "Agama",
-  "version": "0.5.9-dev-3",
+  "version": "0.5.9-dev-4",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -137,6 +137,7 @@
   "resolutions": {
     "lodash": "^4.17.11",
     "js-yaml": "^3.13.1",
-    "tar": "^4.4.8"
+    "tar": "^4.4.8",
+    "https-proxy-agent": "2.2.4"
   }
 }
