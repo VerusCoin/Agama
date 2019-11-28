@@ -323,6 +323,16 @@ const chainParams = {
 			'51.89.22.139',
 		],
 	},
+	WLC21: {
+		ac_supply: 21000000,
+		ac_reward: 190258751,
+		ac_staked: 90,
+		ac_public: 1,
+		addnode: [
+			'37.187.225.231',
+			'51.38.38.134',
+		],
+	},
 };
 
 module.exports = chainParams;
