@@ -57,6 +57,7 @@ const assetChainPorts = {
   DP: 28388,
   VRSCTEST: 17845,
   VRSC: 27486,
+  THC: 36789,
 };
 
 module.exports = assetChainPorts;
