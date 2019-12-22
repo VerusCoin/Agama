@@ -1,7 +1,7 @@
 {
   "name": "Agama",
   "productName": "Agama",
-  "version": "0.6.0-3",
+  "version": "0.6.0-5",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -128,7 +128,6 @@
     "win": {
       "artifactName": "${productName}-Windows-v${version}.${ext}",
       "target": [
-        "nsis",
         "zip"
       ],
       "icon": "assets/icons/agama_app_icon.ico"

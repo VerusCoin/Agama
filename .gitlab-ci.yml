@@ -8,15 +8,14 @@ stages:
 variables:
   DOCKER_DRIVER: overlay2
   DEFAULT_VERUSCOIN_BRANCH: master
-  AGAMA_VERSION: 0.6.0-3
-  VERUSCOIN_VERSION: 0.6.0-3
+  AGAMA_VERSION: 0.6.0-5
+  VERUSCOIN_VERSION: 0.6.0-5
   KOMODO_VERSION: 0.5.0
   BINARY_SOURCE: VerusCoin
   EASYDEX_GUI_BUILD: build.tar.gz
   AGAMA_APPIMAGE: Agama-Linux-v${AGAMA_VERSION}.AppImage
   AGAMA_LINUX_TAR: Agama-Linux-v${AGAMA_VERSION}.tar.gz
   AGAMA_WINDOWS_ZIP: Agama-Windows-v${AGAMA_VERSION}.zip
-  AGAMA_WINDOWS_NSIS: Agama-Windows-v${AGAMA_VERSION}.exe
   AGAMA_MACOS: Agama-MacOS-v${AGAMA_VERSION}.dmg
   GIT_SUBMODULE_STRATEGY: recursive
   POST_COMMENT: "Pipeline Trigger: ${CI_PIPELINE_SOURCE}\n
@@ -115,9 +114,11 @@ build:windows:
   script:
     - yarn run dist-win
     - cd dist
+    - unzip ${AGAMA_WINDOWS_ZIP} -d Agama-Windows-v${AGAMA_VERSION}
+    - rm ${AGAMA_WINDOWS_ZIP}
+    - zip -r ${AGAMA_WINDOWS_ZIP} Agama-Windows-v${AGAMA_VERSION}
     - sha256sum ${AGAMA_WINDOWS_ZIP} > ${AGAMA_WINDOWS_ZIP}.sha256
-    - sha256sum ${AGAMA_WINDOWS_NSIS} > ${AGAMA_WINDOWS_NSIS}.sha256
-    - mv ${AGAMA_WINDOWS_ZIP} ${AGAMA_WINDOWS_ZIP}.sha256 ${AGAMA_WINDOWS_NSIS} ${AGAMA_WINDOWS_NSIS}.sha256 ..
+    - mv ${AGAMA_WINDOWS_ZIP} ${AGAMA_WINDOWS_ZIP}.sha256 ..
   after_script:
     - curl -F file=@"$AGAMA_WINDOWS_ZIP"
       -F channels="$AGAMA_POST_CHANNEL"
@@ -128,8 +129,6 @@ build:windows:
     paths:
       - ${AGAMA_WINDOWS_ZIP}
       - ${AGAMA_WINDOWS_ZIP}.sha256
-      - ${AGAMA_WINDOWS_NSIS}
-      - ${AGAMA_WINDOWS_NSIS}.sha256
       - dist
     expire_in: 1 week
 ########################################################################################################################
@@ -203,6 +202,4 @@ deploy:
       - ${AGAMA_WINDOWS_ZIP}.sha256
       - ${AGAMA_MACOS}
       - ${AGAMA_MACOS}.sha256
-      - ${AGAMA_WINDOWS_NSIS}
-      - ${AGAMA_WINDOWS_NSIS}.sha256
     expire_in: 1 week
