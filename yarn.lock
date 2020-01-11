@@ -80,7 +80,7 @@ after@0.8.2:
 
 "agama-wallet-lib@git+https://github.com/VerusCoin/agama-wallet-lib.git#dev":
   version "0.3.4"
-  resolved "git+https://github.com/VerusCoin/agama-wallet-lib.git#f8558e26b37b7c764d537803d6c67e5584c1c65b"
+  resolved "git+https://github.com/VerusCoin/agama-wallet-lib.git#cd39723266141ee0844e917937b33eda1a2ccca9"
   dependencies:
     bigi "^1.4.2"
     bip32 "^1.0.2"
@@ -503,7 +503,7 @@ bitcoinjs-message@^2.1.0:
 
 "bitgo-utxo-lib@git+https://github.com/VerusCoin/bitgo-utxo-lib.git":
   version "1.5.0"
-  resolved "git+https://github.com/VerusCoin/bitgo-utxo-lib.git#52a3cc192d09ddbfe0c44ffbdb9aab3fb31ca6c4"
+  resolved "git+https://github.com/VerusCoin/bitgo-utxo-lib.git#e52f3ab56b609624d24d78ed62c28f56d2d4deef"
   dependencies:
     bech32 "0.0.3"
     bigi "^1.4.0"
