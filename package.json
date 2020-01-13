@@ -1,7 +1,7 @@
 {
   "name": "Agama",
   "productName": "Agama",
-  "version": "0.6.0-5",
+  "version": "0.6.1",
   "description": "Agama Wallet Desktop App",
   "main": "main.js",
   "scripts": {
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
-    "agama-wallet-lib": "https://github.com/VerusCoin/agama-wallet-lib.git#dev",
+    "agama-wallet-lib": "git+https://github.com/VerusCoin/agama-wallet-lib.git#dev",
     "arch": "^2.1.0",
     "async": "^2.6.0",
     "bigi": "^1.4.2",
@@ -138,6 +138,7 @@
     "js-yaml": "^3.13.1",
     "tar": "^4.4.8",
     "https-proxy-agent": "2.2.4",
-    "mem": "4.0.0"
+    "mem": "4.0.0",
+    "bin-links": "1.1.6"
   }
 }

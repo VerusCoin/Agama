@@ -26,6 +26,16 @@ const chainParams = {
 	WLC: {
 		ac_supply: 210000000,
 	},
+	WLC21: {
+		ac_supply: 21000000,
+		ac_reward: 190258751,
+		ac_staked: 90,
+		ac_public: 1,
+		addnode: [
+			'37.187.225.231',
+			'51.38.38.134',
+		],
+	},
 	PANGEA: {
 		ac_supply: 999999,
 	},
@@ -304,7 +314,7 @@ const chainParams = {
 	},
 	DP: {
 		ac_supply: 55500000,
-		ac_sapling: 1, 
+		ac_sapling: 1,
 		ac_public: 1,
 		ac_staked: 50,
 		ac_reward: 646400000,
