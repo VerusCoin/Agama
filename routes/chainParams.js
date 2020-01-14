@@ -58,11 +58,7 @@ const chainParams = {
 	HODL: {
 		ac_supply: 9999999,
 	},
-	ILN: {
-		ac_supply: 10000000000,
-		ac_cc: 2,
-		addnode: '51.75.122.83',
-	},
+
 	MSHARK: {
 		ac_supply: 1400000,
 	},
