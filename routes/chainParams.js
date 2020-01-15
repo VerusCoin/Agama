@@ -327,6 +327,23 @@ const chainParams = {
 			'51.89.22.139',
 		],
 	},
+	THC: {
+		ac_supply: 251253103,
+		ac_reward: '360000000,300000000,240000000,180000000,150000000,90000000,0',
+		ac_staked: 100,
+		ac_eras: 7,
+  		ac_end: '500001,1000001,1500001,2000001,2500001,4500001,0',
+   		ac_perc: 233333333,
+   		ac_cc: 2,
+	        ac_ccenable": '229,236,240',
+	        ac_founders: 150,
+                ac_cbmaturity: 1,
+		ac_sapling: 1,
+		addnode: [
+			'165.22.52.123',
+			'157.230.45.184',
+		],
+	},
 };
 
 module.exports = chainParams;
